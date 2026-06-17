@@ -14,3 +14,6 @@ data/raw/*.zip
 candidates.jsonl
 candidates.jsonl.gz
 strategy/
+
+# provided deck template (large binary; our deck is exported separately)
+Idea Submission Template _ Redrob.pptx

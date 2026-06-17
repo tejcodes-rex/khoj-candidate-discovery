@@ -1,98 +1,67 @@
-# Khoj
+# Khoj — Intelligent Candidate Discovery
 
-**The discovery engine that finds what filters miss.**
+Ranking the top 100 candidates for Redrob's Senior AI Engineer role out of a pool of 100,000, for the India Runs Data and AI Challenge.
 
-Khoj is an intelligent candidate discovery system built for the India Runs Data and AI Challenge. It does not filter resumes. It reads a nuanced job description, understands what the role actually needs, and ranks an entire pool of messy, real-world profiles by genuine fit, surfacing the high-potential candidates that keyword search and even plain semantic search leave at the bottom.
+Khoj reads each candidate the way a careful engineer would read the job description: it weighs what people actually built over the keywords they listed, trusts skills only when the platform signals back them up, applies the disqualifiers the JD spells out, and discounts candidates who look great on paper but are not reachable. It runs in about 16 seconds on a laptop CPU with no network and no GPU.
 
-It runs end to end on any laptop with no GPU and no network, in milliseconds per query.
+## Reproduce the submission
 
----
-
-## Why this exists
-
-Recruiters drown in profiles and lean on keyword filters that reward the obvious candidate and bury the hidden gem: the self-taught backend engineer from a tier-three college who quietly rebuilt a payments service to handle five times the traffic, the data scientist who shipped a real ranking system but never wrote it in the words a filter is scanning for.
-
-Khoj is built around that exact gap. It treats discovery as a ranking problem over three families of signal, and it explains every decision it makes.
-
-## What it does
-
-1. **Reads the job, not just the keywords.** A job description is parsed into a structured requirement spec: must-have skills, nice-to-have skills, an experience band, a seniority level, and intent flags mined from the prose (for example, a description that says it cares more about what you have shipped than where you studied switches on a pedigree-agnostic mode).
-
-2. **Survives messy data.** Profiles arrive unstandardized: junk casing, missing fields, duplicates, Hinglish and regional-language fragments. The ingestion layer canonicalizes all of it into one clean shape, folds common Hinglish to keywords so multilingual profiles still contribute signal, and drops near-duplicates.
-
-3. **Ranks on three signal families, the way the brief asks.**
-   - **Relevance** decides who can do the job: semantic similarity to the role plus skill-ontology coverage of the requirements and the experience band.
-   - **Signals** decide who to call first among the qualified: career trajectory (how fast someone is climbing), behavioral intent (how reachable and likely-to-move they are), and the Hidden-Gem potential score.
-   Signals refine relevance multiplicatively, so a high-intent but unqualified profile can never crowd out a qualified one.
-
-4. **Finds the hidden gems.** The potential score measures demonstrated impact and trajectory against surface pedigree. When someone looks far stronger than their credentials suggest, Khoj flags them and boosts them, with the reason attached.
-
-5. **Explains itself.** Every ranked candidate ships with a score breakdown, the skills that matched, the must-haves still missing, and plain-language evidence for the trajectory, intent, and potential calls.
-
-## Architecture
-
-```
-Messy profiles ─▶ Ingest + normalize ─▶ Feature + signal extraction ─▶ Semantic index
-                                                                              │
-Job description ─▶ JD understanding (structured spec) ────────────────────────┤
-                                                                              ▼
-                                            Stage 1: fast semantic retrieval (top N)
-                                                                              │
-                                                                              ▼
-                              Stage 2: relevance x (trajectory + intent + hidden-gem)
-                                                                              │
-                                   ┌──────────────────────┬───────────────────┤
-                                   ▼                      ▼                   ▼
-                            explainability         (fairness audit)     ranked shortlist
+```bash
+python rank.py --candidates ./candidates.jsonl --out ./submission.csv
 ```
 
-The semantic backend is pluggable. The default is a dependency-free TF-IDF space so anyone can clone and run instantly. A sentence-transformer backend slots in behind the same interface when extra accuracy is wanted. The same is true for the index (exact cosine for small pools, approximate-nearest-neighbour for scale) and the JD parser (rule-based by default, model-based optional).
+That single command reads the candidate pool and writes a validator-compliant top-100 CSV. No pre-computation, no downloads, no API keys. Standard library only.
+
+Validate it with the organizers' checker:
+
+```bash
+python validate_submission.py submission.csv     # prints "Submission is valid."
+```
+
+## How it ranks (the short version)
+
+The job description is the rubric. It says plainly that the right answer is not "whoever lists the most AI keywords," that career evidence beats buzzwords, and that behavioral signals decide who is actually hireable. Khoj encodes exactly that.
+
+Every candidate gets a fit score in `[0, 1]` from four weighted components, then two multipliers:
+
+| Part | What it captures | Weight |
+|---|---|---|
+| Career evidence | Retrieval, ranking, search, recsys, NLP, vector-DB, and production terms found in the **career-history descriptions and titles**, not the skills list | 0.40 |
+| Skill trust | Relevant skills, each scaled by endorsements, months used, and Redrob assessment score, so unendorsed and untested skills earn almost nothing | 0.22 |
+| Title | Direct-fit titles score high, off-role titles (Marketing Manager, Accountant, and so on) score near zero | 0.18 |
+| Experience | Closeness to the JD's ideal 6 to 8 year band | 0.20 |
+| Behavioral multiplier | Recency of activity, recruiter response rate, open-to-work, notice period | x0.5 to x1.0 |
+| Location multiplier | India hubs (Pune and Noida preferred) at full weight, overseas candidates discounted unless flagged to relocate | x0.6 to x1.0 |
+
+On top of that, named JD disqualifiers apply real penalties: keyword stuffers (AI skills under a non-technical title), entire careers at services firms with no product experience, job-hoppers, vision/speech/robotics profiles with no NLP or retrieval, and pure-research backgrounds with no production work.
+
+### Honeypots
+
+The pool seeds about eighty internally-impossible profiles, and ranking more than ten percent of them in the top 100 is an instant disqualification. Khoj detects them with conservative consistency checks (claimed mastery of a skill with zero months used, total tenure exceeding the stated career length, dates that do not add up) and forces them out of the shortlist. The trust-weighted scoring already starves them of points; this is the safety net. Current run: 0 honeypots in the top 100.
+
+### Reasoning
+
+Each of the 100 rows carries a one-line reasoning built from the candidate's own fields: title, years, the specific career evidence found, the trust-verified skills, and the behavioral signals, with honest concerns called out where they exist. Nothing is templated and nothing is invented.
 
 ## Repository layout
 
 ```
-khoj/            the engine
-  text.py        normalization, multilingual folding, TF-IDF + cosine
-  skills.py      skill ontology and canonicalization
-  data_io.py     loading, canonicalization, dedup, and the real-data adapter point
-  jd.py          job-description understanding
-  signals.py     trajectory, intent, and hidden-gem potential
-  rank.py        two-stage retrieve and rerank
-  evaluate.py    NDCG, Recall, Precision, MRR, and Hidden-Gem Recovery vs baselines
-scripts/
-  make_synthetic.py   the synthetic Indian profile generator
-data/
-  raw/           input profiles, jobs, relevance labels
-  output/        ranked shortlists (JSON and CSV)
-run.py           end-to-end runner
+rank.py            reproduce entrypoint: candidates.jsonl -> submission.csv
+khoj/
+  lexicons.py      the JD encoded as machine-readable term sets
+  scoring.py       the fit scorer (the heart of the system)
+  honeypot.py      internal-consistency / impossibility detection
+  reasoning.py     grounded, per-candidate reasoning
+docs/
+  METHODOLOGY.md   full design walkthrough and the rationale for every choice
+submission_metadata.yaml   team and reproducibility metadata
+requirements.txt   (standard library only; optional accelerators listed)
 ```
 
-## Run it
+## Compute profile
 
-```bash
-python scripts/make_synthetic.py     # build the sample dataset
-python run.py                        # rank all jobs, write shortlists, print evaluation
-python run.py --job JOB001 --topk 15 # a single role, larger shortlist
-```
+Measured on the full 100,000-candidate pool: about 16 seconds wall-clock, well under 100 MB of working memory, CPU only, no network. The organizers' limits are 5 minutes, 16 GB, CPU only, no network, which this clears comfortably. A system that called a hosted model per candidate could not.
 
-Outputs land in `data/output/` as both JSON (full detail with evidence) and CSV (recruiter-ingest ready).
+## Getting the data
 
-## Results on the sample data
-
-The sample includes the case recruiters actually struggle with: keyword-stuffed but stagnant profiles that look great on text alone, and rising hidden gems who write themselves in shorthand ("node", "k8s", "recsys") with sparse, sometimes Hinglish summaries. Measured against the two baselines most systems ship, a naive keyword filter and a semantic-only ranker, averaged across the two roles:
-
-| System | NDCG@10 | Precision@10 | Hidden-Gem Recovery@10 |
-|---|---|---|---|
-| keyword filter | 0.71 | 1.00 | 0.00 |
-| semantic only | 0.67 | 1.00 | 0.00 |
-| **Khoj** | **0.85** | **1.00** | **0.56** |
-
-The number that matters: both baselines recover zero hidden gems. The keyword filter cannot tell that "k8s" means Kubernetes, and semantic search ranks the sparse-text gem far below the buzzword-stuffed profile. Khoj recovers half to two-thirds of the hidden gems while also lifting overall ranking quality by 19 to 33%, and it does it in under two milliseconds per query. Signals refine relevance rather than override it, so precision stays at 1.00 the whole way.
-
-## Connecting the real dataset
-
-Point the loader at the official file and write one adapter function in `khoj/data_io.py` that maps the source columns to the canonical candidate shape. Nothing downstream changes. The output format is configured in `run.py` to match the required submission schema.
-
-## Status
-
-Working end to end: ingestion, multilingual normalization, JD understanding, two-stage ranking, hidden-gem detection, explainability, evaluation against baselines, and ranked-shortlist output. Active work: the sentence-transformer backend, the recruiter demo interface, the fairness audit report, and the learning-to-rank reranker trained on labeled data.
+The candidate pool ships with the hackathon bundle as `candidates.jsonl` (or `candidates.jsonl.gz`, which `rank.py` reads directly). It is not redistributed in this repository. Place it at the repo root or pass its path with `--candidates`.

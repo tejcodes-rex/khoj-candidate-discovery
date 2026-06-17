@@ -1,0 +1,80 @@
+# Redrob Hackathon — Submission Metadata
+# Mirrors the portal metadata. Fill the TODOs before submitting.
+
+# ============================================================================
+# Team identity  (note from portal: Team ID and team name are the same)
+# ============================================================================
+team_name: "TODO_TEAM_ID"            # use your registered Team ID from the intro session
+
+primary_contact:
+  name: "Tejas Mane"
+  email: "tejasmane006@gmail.com"    # TODO verify which email is registered
+  phone: "TODO_PHONE"
+
+team_members:
+  - name: "Tejas Mane"
+    email: "tejasmane006@gmail.com"
+    role: "ML / Backend"
+  - name: "TODO_MEMBER_2_NAME"
+    email: "TODO_MEMBER_2_EMAIL"
+    role: "TODO"
+
+# ============================================================================
+# Code and reproducibility
+# ============================================================================
+github_repo: "TODO_https://github.com/USERNAME/REPO"   # must be public before submitting
+sandbox_link: "TODO_hosted_demo_link"                  # HuggingFace Spaces / Streamlit / Replit / Colab / Docker / Binder
+reproduce_command: "python rank.py --candidates ./candidates.jsonl --out ./submission.csv"
+
+# ============================================================================
+# Compute environment
+# ============================================================================
+compute:
+  platform: "Windows 11 laptop"
+  cpu_cores: 8
+  ram_gb: 16
+  python_version: "3.12.10"
+  os: "Windows 11"
+  uses_gpu_for_inference: false
+  has_network_during_ranking: false
+  pre_computation_required: false
+  pre_computation_time_minutes: 0
+
+# ============================================================================
+# AI tools declaration  (decision deferred to submission time; declare honestly)
+# ============================================================================
+ai_tools_used:
+  - "TODO_decide_at_submission"
+ai_usage_summary: |
+  TODO at submission. The rules state declared AI use is not penalized and that a
+  declaration contradicting the interview is the bigger risk. No candidate data
+  was sent to any external service; ranking runs fully offline.
+
+# ============================================================================
+# Approach summary  (<=200 words)
+# ============================================================================
+methodology_summary: |
+  Khoj is a transparent, rule-based ranker that treats the job description as the
+  rubric. Each candidate scores on four weighted parts: career-history evidence
+  of retrieval, ranking, search, recsys and NLP work (weighted above the skills
+  list), skills trust-weighted by endorsements, months used and assessment score,
+  title relevance, and closeness to the 6 to 8 year band. Two multipliers follow:
+  a behavioral-availability factor from Redrob activity signals, and a location
+  factor favouring India hubs. The JD's named disqualifiers (off-role keyword
+  stuffers, pure-services careers, job-hoppers, vision/speech-only, pure research)
+  apply explicit penalties. Honeypots are caught by internal-consistency checks
+  and forced out of the shortlist. Reasoning for each pick is generated from the
+  candidate's own fields, with honest concerns surfaced. The whole ranking runs in
+  about 16 seconds on a laptop CPU, no GPU, no network, no per-candidate model
+  calls, which is both a compute-budget requirement and a statement about what
+  scales in a real recruiting product.
+
+# ============================================================================
+# Declarations
+# ============================================================================
+declarations:
+  read_submission_spec: true
+  code_is_original_work: true
+  no_collusion: true
+  honeypot_check_done: true
+  reproduction_tested: true
