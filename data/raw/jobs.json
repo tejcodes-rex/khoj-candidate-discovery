@@ -1,0 +1,40 @@
+[
+  {
+    "job_id": "JOB001",
+    "title": "Backend Engineer, Payments",
+    "description": "We are looking for a backend engineer to own our payments platform. You will design high-throughput, low-latency services that move money reliably. We care far more about people who have actually shipped and scaled real systems than about where they studied. Comfort with distributed systems, databases under load, and clean API design is essential. Bonus if you have driven a system end to end and improved its latency or reliability. This is a hands-on role, not a manager role.",
+    "must_have": [
+      "backend",
+      "APIs",
+      "databases",
+      "distributed systems"
+    ],
+    "nice_to_have": [
+      "latency optimization",
+      "payments",
+      "Go",
+      "Kafka"
+    ],
+    "min_experience_years": 3,
+    "seniority": "mid-to-senior"
+  },
+  {
+    "job_id": "JOB002",
+    "title": "Machine Learning Engineer, Search and Ranking",
+    "description": "Join us to build the retrieval and ranking brain of our product. You will work on semantic search, embeddings, and rerankers over very large, messy datasets. We want builders who have put ranking or recommendation systems into production, not only people who have read papers. Strong Python and a real feel for evaluation metrics matter. Background and pedigree matter less than what you have actually built and measured.",
+    "must_have": [
+      "machine learning",
+      "ranking",
+      "embeddings",
+      "Python"
+    ],
+    "nice_to_have": [
+      "semantic search",
+      "RAG",
+      "recommendation systems",
+      "MLOps"
+    ],
+    "min_experience_years": 2,
+    "seniority": "mid"
+  }
+]

@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+.DS_Store
+.idea/
+.vscode/
+data/output/*.json
+data/output/*.csv
+# keep the real dataset out of version control until cleared for sharing
+data/raw/official_*
+strategy/

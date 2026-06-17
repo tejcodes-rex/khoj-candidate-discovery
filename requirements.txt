@@ -1,0 +1,14 @@
+# Khoj runs end to end on the Python standard library alone.
+# Everything below is optional and only unlocks higher-accuracy backends.
+
+# Optional: stronger semantic embeddings (set backend to "sbert")
+# sentence-transformers>=2.2.0
+
+# Optional: approximate-nearest-neighbour index for very large pools
+# hnswlib>=0.7.0
+
+# Optional: learning-to-rank reranker trained on labeled relevance
+# lightgbm>=4.0.0
+
+# Optional: language detection for the multilingual layer
+# fasttext-langdetect>=1.0.0
