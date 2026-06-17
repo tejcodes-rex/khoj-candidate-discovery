@@ -8,6 +8,9 @@ venv/
 .vscode/
 data/output/*.json
 data/output/*.csv
-# keep the real dataset out of version control until cleared for sharing
-data/raw/official_*
+# the provided dataset is large and not ours to redistribute; keep it out
+data/raw/official/
+data/raw/*.zip
+candidates.jsonl
+candidates.jsonl.gz
 strategy/
