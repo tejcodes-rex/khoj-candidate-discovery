@@ -29,6 +29,11 @@ ALIASES = {
     "distributed systems": ["distributed system", "distributed computing"],
     "amazon web services": ["aws"],
     "vector search": ["semantic search", "ann", "nearest neighbour search"],
+    # generic umbrella terms that job descriptions love to use
+    "backend": ["back end", "backend development", "server side"],
+    "databases": ["database", "db", "sql", "rdbms"],
+    "frontend": ["front end", "frontend development", "ui development"],
+    "infrastructure": ["devops", "infra"],
 }
 
 # canonical skill -> family. Family overlap gives partial credit during scoring.
@@ -45,6 +50,16 @@ FAMILY = {
     "transformers": "ml", "vector search": "ml", "recommendation systems": "ml",
     "large language models": "ml", "embeddings": "ml", "mlops": "ml",
     "pandas": "data", "feature engineering": "ml", "rag": "ml",
+    # umbrella terms map to their own family so JD generics are recognized
+    "backend": "backend", "databases": "data", "frontend": "web",
+    "infrastructure": "infra", "machine learning": "ml",
+}
+
+# family -> the umbrella skill term a generic JD would use. Lets a candidate who
+# lists "kafka" satisfy a requirement written as "backend" or "databases".
+FAMILY_UMBRELLA = {
+    "backend": "backend", "data": "databases", "web": "frontend",
+    "infra": "infrastructure", "ml": "machine learning",
 }
 
 _ALIAS_LOOKUP = {}
@@ -78,3 +93,14 @@ def canonical_set(skills):
 def families(skills):
     """Return the set of skill families covered by a set of canonical skills."""
     return {FAMILY.get(s) for s in skills if FAMILY.get(s)}
+
+
+def with_umbrellas(skill_set):
+    """Add the umbrella term for every family the candidate already covers, so a
+    profile listing concrete skills also satisfies generically worded requirements."""
+    out = set(skill_set)
+    for fam in families(skill_set):
+        umbrella = FAMILY_UMBRELLA.get(fam)
+        if umbrella:
+            out.add(umbrella)
+    return out

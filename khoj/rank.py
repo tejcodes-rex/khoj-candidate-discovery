@@ -29,13 +29,13 @@ from .text import TfidfSpace
 # a qualified one. This is what keeps ranking accuracy from regressing while the
 # differentiators still do their job.
 RELEVANCE = {
-    "semantic": 0.45,      # embedding similarity to the JD
-    "requirement": 0.55,   # must-have / nice-to-have coverage and experience band
+    "semantic": 0.35,      # embedding similarity to the JD (supporting signal)
+    "requirement": 0.65,   # must-have / nice-to-have coverage and experience band
 }
 SIGNAL = {
-    "trajectory": 0.15,    # career velocity
-    "intent": 0.15,        # behavioral, likelihood to move and respond
-    "potential": 0.30,     # hidden-gem boost (amplified for pedigree-agnostic JDs)
+    "trajectory": 0.20,    # career velocity
+    "intent": 0.20,        # behavioral, likelihood to move and respond
+    "potential": 0.45,     # hidden-gem boost (amplified for pedigree-agnostic JDs)
 }
 
 

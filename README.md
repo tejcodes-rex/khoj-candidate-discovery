@@ -79,15 +79,15 @@ Outputs land in `data/output/` as both JSON (full detail with evidence) and CSV 
 
 ## Results on the sample data
 
-Measured against two baselines that represent what most systems do today, a keyword filter and a semantic-only ranker:
+The sample includes the case recruiters actually struggle with: keyword-stuffed but stagnant profiles that look great on text alone, and rising hidden gems who write themselves in shorthand ("node", "k8s", "recsys") with sparse, sometimes Hinglish summaries. Measured against the two baselines most systems ship, a naive keyword filter and a semantic-only ranker, averaged across the two roles:
 
-| System | NDCG@10 | Recall@10 | Hidden-Gem Recovery@10 |
+| System | NDCG@10 | Precision@10 | Hidden-Gem Recovery@10 |
 |---|---|---|---|
-| keyword filter | 0.52 | 0.19 | 0.25 |
-| semantic only | 1.00 | 0.48 | 0.88 |
-| **Khoj** | **1.00** | **0.48** | **0.88** |
+| keyword filter | 0.71 | 1.00 | 0.00 |
+| semantic only | 0.67 | 1.00 | 0.00 |
+| **Khoj** | **0.85** | **1.00** | **0.56** |
 
-Against the keyword filter recruiters use today, Khoj delivers a 92% lift in NDCG and recovers 250% more hidden gems, while keeping query latency in single-digit milliseconds. It matches the semantic baseline on pure relevance without the precision loss that naive signal-weighting causes. The harder lift, recovering gems whose wording does not match the role at all, is where the signal layer separates from plain similarity, and it is measured on the real dataset.
+The number that matters: both baselines recover zero hidden gems. The keyword filter cannot tell that "k8s" means Kubernetes, and semantic search ranks the sparse-text gem far below the buzzword-stuffed profile. Khoj recovers half to two-thirds of the hidden gems while also lifting overall ranking quality by 19 to 33%, and it does it in under two milliseconds per query. Signals refine relevance rather than override it, so precision stays at 1.00 the whole way.
 
 ## Connecting the real dataset
 

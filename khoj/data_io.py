@@ -30,7 +30,7 @@ def _years(experience):
 def canonicalize(raw):
     """Turn one raw profile into the canonical Candidate shape, defensively."""
     exp = raw.get("experience") or []
-    skill_set = skills.canonical_set(raw.get("skills"))
+    skill_set = skills.with_umbrellas(skills.canonical_set(raw.get("skills")))
 
     # Mine skills out of free text too, so under-tagged profiles are not penalized.
     blob = " ".join([
@@ -60,6 +60,10 @@ def canonicalize(raw):
         "experience": exp,
         "signals": raw.get("signals") or {},
         "text_blob": norm_blob,
+        # raw, un-canonicalized surface forms, used only to model a naive keyword
+        # filter that has no skill ontology (the baseline we beat)
+        "_raw_skills": [str(s).lower().strip() for s in (raw.get("skills") or [])],
+        "_raw_text": (blob + " " + " ".join(str(s) for s in (raw.get("skills") or []))).lower(),
         # carried through only for offline evaluation; never used in scoring
         "_archetype": raw.get("_archetype"),
     }

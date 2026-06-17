@@ -112,10 +112,10 @@ def main():
             r = m[name]
             print(f"{name:<10} {r['ndcg@k']:>6.3f} {r['recall@k']:>7.3f} "
                   f"{r['precision@k']:>6.3f} {r['mrr']:>6.3f} {r['gem_recovery@k']:>9.3f}")
-        print(f"khoj lift vs semantic  ->  NDCG {pct(m['khoj']['ndcg@k'], m['semantic']['ndcg@k'])}, "
-              f"GemRecovery {pct(m['khoj']['gem_recovery@k'], m['semantic']['gem_recovery@k'])}")
-        print(f"khoj lift vs keyword   ->  NDCG {pct(m['khoj']['ndcg@k'], m['keyword']['ndcg@k'])}, "
-              f"GemRecovery {pct(m['khoj']['gem_recovery@k'], m['keyword']['gem_recovery@k'])}")
+        print(f"khoj vs semantic  ->  NDCG {pct(m['khoj']['ndcg@k'], m['semantic']['ndcg@k'])}, "
+              f"gem recovery {m['khoj']['gem_recovery@k']:.2f} vs {m['semantic']['gem_recovery@k']:.2f}")
+        print(f"khoj vs keyword   ->  NDCG {pct(m['khoj']['ndcg@k'], m['keyword']['ndcg@k'])}, "
+              f"gem recovery {m['khoj']['gem_recovery@k']:.2f} vs {m['keyword']['gem_recovery@k']:.2f}")
         print()
 
     print(f"Shortlists written to {OUT}")

@@ -62,13 +62,18 @@ def hidden_gem_recovery_at_k(ranked_ids, gem_ids, k):
 # ---- baselines --------------------------------------------------------------
 
 def keyword_ranking(spec, candidates):
-    """A filter-style baseline: order by must-have keyword overlap, then nice."""
-    must = set(spec["must_have"])
-    nice = set(spec["nice_to_have"])
+    """
+    A naive keyword filter, the kind recruiters use today: it has no skill
+    ontology, so it matches the job description's exact terms against the raw
+    profile text. It cannot tell that "node" means Node.js or that "k8s" means
+    Kubernetes, so it misses the gems that write themselves in shorthand.
+    """
+    must = [t.lower() for t in spec["must_have"]]
+    nice = [t.lower() for t in spec["nice_to_have"]]
     scored = []
     for c in candidates:
-        sk = set(c["skills"])
-        score = len(sk & must) * 2 + len(sk & nice)
+        text = c.get("_raw_text", "")
+        score = sum(2 for t in must if t in text) + sum(1 for t in nice if t in text)
         scored.append((c["candidate_id"], score))
     scored.sort(key=lambda x: x[1], reverse=True)
     return [cid for cid, _ in scored]

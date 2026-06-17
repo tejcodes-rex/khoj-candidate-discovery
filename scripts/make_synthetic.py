@@ -78,6 +78,34 @@ ML_SKILLS = ["PyTorch", "TensorFlow", "scikit-learn", "NLP", "transformers",
 FRONTEND_SKILLS = ["React", "TypeScript", "Next.js", "CSS", "Redux",
                    "accessibility", "performance optimization"]
 
+# Alias / surface forms of real skills. A keyword filter scanning for the exact
+# job-description terms misses these; our ontology canonicalizes them. Hidden
+# gems are written this way on purpose.
+BACKEND_ALIASES = ["JS", "node", "k8s", "postgres", "REST", "distributed system",
+                   "microservices", "system design", "Go", "aws"]
+ML_ALIASES = ["ml", "nlp", "recsys", "ann", "semantic search", "embeddings",
+              "pandas", "py", "feature engineering"]
+
+# Sparse, messy, mostly-Hinglish summaries with almost no job-description
+# vocabulary. Semantic similarity to a polished JD stays low even though the
+# person is genuinely qualified.
+GEM_SUMMARY = [
+    "kaam karne ka strong experience hai, sab khud banaya",
+    "bahut saare projects banaye hain apne dum pe",
+    "apne aap seekha aur real cheezein ship ki",
+    "college se zyada kaam se seekha",
+]
+
+# Keyword-stuffed summaries that echo the JD almost word for word. Semantic
+# search ranks these at the top, but their careers are flat and they are not
+# really looking. The classic false positive.
+STUFFED_BE = ("Backend engineer experienced in distributed systems, payments, "
+              "high-throughput low-latency APIs, databases under load, reliable "
+              "scalable system design, microservices, and clean REST API design.")
+STUFFED_ML = ("Machine learning engineer specializing in semantic search, ranking, "
+              "embeddings, retrieval, recommendation systems, RAG, evaluation "
+              "metrics, and putting models into production at scale.")
+
 # Hinglish / regional fragments to make profiles multilingual and messy
 HINGLISH = [
     "kaam karne ka strong experience hai",
@@ -180,12 +208,11 @@ def make_profile(idx, archetype):
     elif archetype == "gem_be":
         college = random.choice(TIER3_COLLEGE)
         employers = random.sample(SMALL_EMPLOYER, k=2)
-        skills = random.sample(BACKEND_SKILLS, k=7)
+        skills = random.sample(BACKEND_ALIASES, k=7)
         roles = career_history(3, 2020, True, employers, "Backend Developer")
-        roles[-1]["blurb"] = ("Rebuilt the payments service to handle 5x traffic, "
-                              "cut p99 latency from 1200ms to 180ms, owned it end to end.")
+        roles[-1]["blurb"] = "5x traffic handle kiya, sab khud banaya aur ship kiya"
         intent = "hot"
-        summary = messy("Self-driven backend dev, shipped real production systems solo.")
+        summary = messy(random.choice(GEM_SUMMARY))
     elif archetype == "obvious_ml":
         college = random.choice(TIER1_COLLEGE)
         employers = random.sample(TIER1_EMPLOYER, k=2)
@@ -196,12 +223,25 @@ def make_profile(idx, archetype):
     elif archetype == "gem_ml":
         college = random.choice(TIER3_COLLEGE)
         employers = random.sample(SMALL_EMPLOYER, k=2)
-        skills = random.sample(ML_SKILLS, k=7)
+        skills = random.sample(ML_ALIASES, k=7)
         roles = career_history(2, 2021, True, employers, "Data Scientist")
-        roles[-1]["blurb"] = ("Built a semantic search and ranking system over 2M profiles "
-                              "with vector embeddings and reranking, deployed to production.")
+        roles[-1]["blurb"] = "2M data pe khud ka system banaya aur prod me daala"
         intent = "hot"
-        summary = messy("Mostly self-taught ML, built retrieval and ranking systems that shipped.")
+        summary = messy(random.choice(GEM_SUMMARY))
+    elif archetype == "stuffed_be":
+        college = random.choice(TIER1_COLLEGE + TIER2_COLLEGE)
+        employers = random.sample(TIER1_EMPLOYER, k=2)
+        skills = random.sample(BACKEND_SKILLS, k=9)
+        roles = career_history(2, 2019, False, employers, "Backend Engineer")
+        intent = random.choice(["cold", "cold", "warm"])
+        summary = STUFFED_BE
+    elif archetype == "stuffed_ml":
+        college = random.choice(TIER1_COLLEGE + TIER2_COLLEGE)
+        employers = random.sample(TIER1_EMPLOYER, k=2)
+        skills = random.sample(ML_SKILLS, k=9)
+        roles = career_history(2, 2019, False, employers, "ML Engineer")
+        intent = random.choice(["cold", "cold", "warm"])
+        summary = STUFFED_ML
     else:  # noise
         college = random.choice(TIER2_COLLEGE + TIER3_COLLEGE)
         employers = random.sample(SMALL_EMPLOYER + TIER1_EMPLOYER, k=2)
@@ -245,10 +285,11 @@ def build():
     profiles = []
     idx = 0
 
-    # Distribution: lots of noise, a handful of obvious fits, a precious few gems.
-    plan = (["obvious_be"] * 12 + ["gem_be"] * 8 +
-            ["obvious_ml"] * 12 + ["gem_ml"] * 8 +
-            ["noise"] * 160)
+    # Distribution: lots of noise, some clean fits, keyword-stuffed-but-stagnant
+    # false positives, and a precious few hidden gems.
+    plan = (["obvious_be"] * 10 + ["gem_be"] * 8 + ["stuffed_be"] * 10 +
+            ["obvious_ml"] * 10 + ["gem_ml"] * 8 + ["stuffed_ml"] * 10 +
+            ["noise"] * 154)
     random.shuffle(plan)
     for arch in plan:
         profiles.append(make_profile(idx, arch))
@@ -309,14 +350,17 @@ def build():
     for p in profiles:
         a = p["_archetype"]
         cid = p["candidate_id"]
-        if a == "obvious_be":
+        # 3 = strong hire (qualified, rising, reachable). 2 = qualified on paper
+        # but stagnant and not really looking, a weaker hire for a recruiter who
+        # needs someone who will actually move.
+        if a in ("obvious_be", "gem_be"):
             qrels["JOB001"][cid] = 3
-        elif a == "gem_be":
-            qrels["JOB001"][cid] = 3
-        elif a == "obvious_ml":
+        elif a == "stuffed_be":
+            qrels["JOB001"][cid] = 2
+        elif a in ("obvious_ml", "gem_ml"):
             qrels["JOB002"][cid] = 3
-        elif a == "gem_ml":
-            qrels["JOB002"][cid] = 3
+        elif a == "stuffed_ml":
+            qrels["JOB002"][cid] = 2
         # noise stays unjudged (treated as 0)
 
     with open(RAW / "profiles.jsonl", "w", encoding="utf-8") as f:
