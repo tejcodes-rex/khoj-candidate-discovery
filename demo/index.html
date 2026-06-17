@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Khoj — intelligent candidate discovery</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --line:#2a2f3a;
+    --ink:#e8eaf0; --muted:#9aa3b2; --accent:#ff5a4d; --accent2:#3b82f6;
+    --gem:#f5b301; --good:#34d399;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.5 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  header{padding:22px 28px;border-bottom:1px solid var(--line);display:flex;
+    align-items:baseline;gap:14px}
+  header h1{margin:0;font-size:22px;letter-spacing:.3px}
+  header .tag{color:var(--muted);font-size:13px}
+  .wrap{display:grid;grid-template-columns:380px 1fr;gap:0;min-height:calc(100vh - 66px)}
+  .left{padding:22px 24px;border-right:1px solid var(--line)}
+  .right{padding:22px 28px;overflow:auto}
+  label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.6px;
+    color:var(--muted);margin:16px 0 6px}
+  select,textarea,button{width:100%;background:var(--panel);color:var(--ink);
+    border:1px solid var(--line);border-radius:10px;padding:11px 12px;font:inherit}
+  textarea{min-height:170px;resize:vertical}
+  button{background:var(--accent);border:none;color:#fff;font-weight:600;
+    cursor:pointer;margin-top:16px;padding:13px}
+  button:hover{filter:brightness(1.08)}
+  .meta{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:13px;
+    margin-bottom:18px}
+  .meta b{color:var(--ink)}
+  .pill{display:inline-block;background:var(--panel2);border:1px solid var(--line);
+    border-radius:999px;padding:3px 10px;font-size:12px;margin:2px 4px 2px 0;color:var(--muted)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:16px 18px;margin-bottom:14px}
+  .card .top{display:flex;align-items:center;gap:12px}
+  .rank{font-size:20px;font-weight:700;color:var(--muted);min-width:34px}
+  .name{font-size:17px;font-weight:600}
+  .sub{color:var(--muted);font-size:13px;margin-top:2px}
+  .gem{background:rgba(245,179,1,.15);color:var(--gem);border:1px solid rgba(245,179,1,.4);
+    border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;margin-left:auto}
+  .score{margin-left:auto;text-align:right}
+  .score .n{font-size:20px;font-weight:700}
+  .bars{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:14px 0 10px}
+  .bars .b{font-size:11px;color:var(--muted)}
+  .track{height:6px;background:var(--panel2);border-radius:4px;margin-top:4px;overflow:hidden}
+  .fill{height:100%;background:var(--accent2);border-radius:4px}
+  .fill.pot{background:var(--gem)} .fill.int{background:var(--good)}
+  .why{font-size:13px;color:var(--muted);border-top:1px solid var(--line);
+    margin-top:8px;padding-top:10px}
+  .why b{color:var(--ink);font-weight:600}
+  .empty{color:var(--muted);margin-top:40px;text-align:center}
+  .loading{color:var(--accent2)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Khoj</h1>
+  <span class="tag">the discovery engine that finds what filters miss</span>
+</header>
+<div class="wrap">
+  <div class="left">
+    <label>Try a sample role</label>
+    <select id="preset"><option value="">Custom job description</option></select>
+    <label>Job description</label>
+    <textarea id="jd" placeholder="Paste a job description. The more nuance, the better."></textarea>
+    <label>Shortlist size</label>
+    <select id="topk"><option>10</option><option>15</option><option>20</option></select>
+    <button id="go">Discover candidates</button>
+  </div>
+  <div class="right">
+    <div class="meta" id="meta"></div>
+    <div id="results"><div class="empty">Pick a sample role or paste a job description, then hit discover.</div></div>
+  </div>
+</div>
+<script>
+const $ = s => document.querySelector(s);
+let JOBS = [];
+
+fetch('/api/jobs').then(r=>r.json()).then(j=>{
+  JOBS = j;
+  const sel = $('#preset');
+  j.forEach((job,i)=>{ const o=document.createElement('option');
+    o.value=job.job_id; o.textContent=job.title; sel.appendChild(o); });
+});
+
+$('#preset').onchange = e=>{
+  const job = JOBS.find(x=>x.job_id===e.target.value);
+  $('#jd').value = job ? job.description : '';
+};
+
+function bar(label,val,cls){
+  const pct = Math.round(Math.min(1,val)*100);
+  return `<div class="b">${label}<div class="track"><div class="fill ${cls||''}" style="width:${pct}%"></div></div></div>`;
+}
+
+function render(data){
+  const m = $('#meta');
+  m.innerHTML = `<span>role <b>${data.job_title}</b></span>
+    <span>pool <b>${data.pool_size}</b></span>
+    <span>latency <b>${data.latency_ms} ms</b></span>
+    <span>pedigree-agnostic <b>${data.pedigree_agnostic}</b></span>`;
+  const must = (data.must_have||[]).map(s=>`<span class="pill">${s}</span>`).join('');
+  const res = $('#results');
+  if(!data.shortlist.length){ res.innerHTML='<div class="empty">No candidates matched.</div>'; return; }
+  res.innerHTML = `<div style="margin-bottom:14px;color:var(--muted);font-size:13px">requirements read: ${must}</div>` +
+    data.shortlist.map(c=>{
+    const k=c.components;
+    return `<div class="card">
+      <div class="top">
+        <div class="rank">#${c.rank}</div>
+        <div><div class="name">${c.name||c.candidate_id}</div>
+          <div class="sub">${c.education||''} · ${c.location||''} · ${c.years_experience} yrs</div></div>
+        ${c.hidden_gem?'<div class="gem">HIDDEN GEM</div>':''}
+        <div class="score"><div class="n">${(c.score).toFixed(2)}</div></div>
+      </div>
+      <div class="bars">
+        ${bar('relevance',k.requirement)}
+        ${bar('semantic',k.semantic)}
+        ${bar('trajectory',k.trajectory)}
+        ${bar('intent',k.intent,'int')}
+        ${bar('potential',k.potential,'pot')}
+      </div>
+      <div class="why">
+        <b>Why:</b> ${c.evidence.potential}. ${c.evidence.trajectory}, ${c.evidence.intent}.
+        ${c.matched_skills.length?'<br><b>Matched:</b> '+c.matched_skills.join(', '):''}
+        ${c.missing_must_have.length?'<br><b>Gaps:</b> '+c.missing_must_have.join(', '):''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+$('#go').onclick = ()=>{
+  const preset = $('#preset').value;
+  $('#results').innerHTML = '<div class="empty loading">Ranking the pool...</div>';
+  const body = preset ? {job_id:preset, top_k:+$('#topk').value}
+    : {description:$('#jd').value, top_k:+$('#topk').value};
+  fetch('/api/rank',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(body)}).then(r=>r.json()).then(render);
+};
+</script>
+</body>
+</html>
