@@ -1,14 +1,11 @@
-# Khoj runs end to end on the Python standard library alone.
-# Everything below is optional and only unlocks higher-accuracy backends.
+# The ranker itself (rank.py and everything in khoj/) uses ONLY the Python
+# standard library. The Stage 3 reproduction needs nothing installed.
+#
+# The two packages below are only for the optional extras:
+#   streamlit  -> the hosted sandbox/demo app (app.py)
+#   pytest     -> running the test suite (tests/)
+# They are not imported by the ranking path, so installing them does not affect
+# reproduction of submission.csv.
 
-# Optional: stronger semantic embeddings (set backend to "sbert")
-# sentence-transformers>=2.2.0
-
-# Optional: approximate-nearest-neighbour index for very large pools
-# hnswlib>=0.7.0
-
-# Optional: learning-to-rank reranker trained on labeled relevance
-# lightgbm>=4.0.0
-
-# Optional: language detection for the multilingual layer
-# fasttext-langdetect>=1.0.0
+streamlit>=1.30
+pytest>=7.0
