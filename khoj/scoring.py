@@ -71,10 +71,21 @@ def _career_text(cand):
     return " ".join(parts)
 
 
+JUNIOR_MARKERS = ("junior", "intern", "trainee", "fresher", "entry level", "entry-level")
+SENIOR_MARKERS = ("senior", "staff", "principal", "lead", "head of", "director")
+
+
 def _title_score(cand):
     t = (cand.get("profile", {}).get("current_title") or "").lower()
-    if any(g in t for g in L.GOOD_TITLES):
-        return 1.0, "directly-relevant title"
+    relevant = any(g in t for g in L.GOOD_TITLES)
+    # An explicit junior title is a weak fit for a senior founding-team role,
+    # no matter how on-topic the rest of the title reads.
+    if any(j in t for j in JUNIOR_MARKERS):
+        return (0.45 if relevant else 0.25), "junior-level title for a senior role"
+    if relevant:
+        if any(sm in t for sm in SENIOR_MARKERS):
+            return 1.0, "senior, directly-relevant title"
+        return 0.9, "directly-relevant title"
     if any(a in t for a in L.ADJACENT_TITLES):
         return 0.55, "adjacent title, needs career evidence"
     if any(n in t for n in NON_TECH):
