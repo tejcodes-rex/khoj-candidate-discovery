@@ -17,3 +17,6 @@ strategy/
 
 # provided deck template (large binary; our deck is exported separately)
 Idea Submission Template _ Redrob.pptx
+# generated deck artifacts (rebuild with build_deck.py)
+Khoj_Redrob_Submission_Deck.pptx
+Khoj_Redrob_Submission_Deck.pdf

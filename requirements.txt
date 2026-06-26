@@ -9,3 +9,4 @@
 
 streamlit>=1.30
 pytest>=7.0
+python-pptx>=0.6.23   # only for build_deck.py (fills the Redrob deck template)

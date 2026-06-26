@@ -61,12 +61,21 @@ Edit `submission_metadata.yaml` and replace every `TODO`:
 
 Commit and push the update so the repo metadata matches the portal.
 
-## 4. Build the deck and export to PDF (20 minutes)
+## 4. Deck (already built, just finish two fields)
 
-1. Open "Idea Submission Template _ Redrob.pptx" and make a copy (the template is
-   mandatory).
-2. Fill the slides using the content in `docs/DECK.md`, slide by slide.
-3. Export to PDF, keep it under 5 MB.
+The deck is generated for you from the mandatory template by `build_deck.py`. The
+files `Khoj_Redrob_Submission_Deck.pptx` and `.pdf` (0.33 MB, under the 5 MB
+limit) are in the project folder.
+
+Two TODOs remain:
+- Slide 1: replace `TODO_TEAM_ID` with your registered Team ID.
+- Slide 10: replace `TODO_repo_url` and `TODO_sandbox_url` with the URLs from
+  steps 1 and 2.
+
+Easiest path: tell me your Team ID and the two URLs and I will rebuild the PDF in
+one step. Or edit `build_deck.py` (the `IDENTITY` and `BODY["Submission Assets"]`
+entries), run `python build_deck.py`, and re-export. The slide-by-slide source
+text also lives in `docs/DECK.md` if you prefer to edit in PowerPoint directly.
 
 ## 5. The AI-tools declaration (decide now)
 
