@@ -18,6 +18,14 @@ Validate it with the organizers' checker:
 python validate_submission.py submission.csv     # prints "Submission is valid."
 ```
 
+Or reproduce inside the same kind of sandboxed container Stage 3 uses (CPU only,
+no network, nothing to install since the ranker is standard library only):
+
+```bash
+docker build -t khoj .
+docker run --rm -v "$PWD":/data khoj --candidates /data/candidates.jsonl --out /data/submission.csv
+```
+
 ## How it ranks (the short version)
 
 The job description is the rubric. It says plainly that the right answer is not "whoever lists the most AI keywords," that career evidence beats buzzwords, and that behavioral signals decide who is actually hireable. Khoj encodes exactly that.
