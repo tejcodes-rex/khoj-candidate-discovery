@@ -49,14 +49,22 @@ def main():
     t0 = time.perf_counter()
 
     # Pass 1: score everyone, keep (rounded_score, candidate_id) only.
+    # Dedup by candidate_id (keep first) so a duplicated input line can never
+    # produce two rows with the same id, which the validator rejects.
     scored = []
-    n = honeypots = 0
+    seen_ids = set()
+    n = honeypots = dupes = 0
     for cand in _iter(args.candidates):
-        s = score_candidate(cand)
+        cid = cand["candidate_id"]
         n += 1
+        if cid in seen_ids:
+            dupes += 1
+            continue
+        seen_ids.add(cid)
+        s = score_candidate(cand)
         if s["is_honeypot"]:
             honeypots += 1
-        scored.append((s["final"], cand["candidate_id"]))
+        scored.append((s["final"], cid))
 
     # Sort by rounded score descending, then candidate_id ascending. Rounding
     # before sorting guarantees the validator's tie-break rule holds exactly.

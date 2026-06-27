@@ -38,9 +38,14 @@ def detect(cand):
     # merely used longer than the paid career; people learn skills in school.)
     for s in cand.get("skills", []):
         prof = (s.get("proficiency") or "").lower()
-        dur = s.get("duration_months", None)
-        if prof in ("advanced", "expert") and dur == 0:
+        # Only an EXPLICIT zero is impossible. A missing duration is unknown, not
+        # zero, and treating it as zero would false-flag real candidates whose
+        # advanced skills simply omit the optional duration field.
+        if prof in ("advanced", "expert") and s.get("duration_months") == 0:
             reasons.append(f"claims {prof} '{s.get('name')}' with 0 months of use")
+        # Note: we do NOT flag "skill used longer than the technology has existed"
+        # (e.g. RAG for 89 months). The synthetic dataset has noisy skill durations
+        # across the board, so that check false-flags genuine retrieval builders.
 
     # 2. Total tenure across roles exceeds the stated career length by years.
     total_role_months = sum(r.get("duration_months", 0) or 0 for r in cand.get("career_history", []))

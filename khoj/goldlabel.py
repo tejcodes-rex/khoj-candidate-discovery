@@ -17,7 +17,8 @@ from datetime import date
 
 from . import lexicons as L
 from .honeypot import detect as detect_honeypot
-from .scoring import _career_text, NON_TECH, JUNIOR_MARKERS
+from .match import hits as _mhits
+from .scoring import _history_text, _summary_text, NON_TECH, JUNIOR_MARKERS
 
 REF = date(2026, 6, 17)
 
@@ -41,7 +42,7 @@ def _archetype(cand):
 
 
 def _has(text, terms):
-    return any(t in text for t in terms)
+    return bool(_mhits(text, terms))
 
 
 def gold_tier(cand):
@@ -52,27 +53,33 @@ def gold_tier(cand):
     p = cand.get("profile", {})
     title = (p.get("current_title") or "").lower()
     arch = _archetype(cand)
-    ctext = _career_text(cand)
+    ctext = _history_text(cand)            # DEMONSTRATED work only, not the summary
+    stext = _summary_text(cand)
     yoe = float(p.get("years_of_experience", 0) or 0)
 
     # Hard zeros: off-role people and generic developers with no ML at all.
     if arch == "offrole" or any(n in title for n in NON_TECH):
         return 0
-    ml_terms = {"machine learning", "ml ", "nlp", "deep learning", "embedding",
-                "ranking", "retrieval", "recommendation", "recsys", "search", "llm", "model"}
+    ml_terms = {"machine learning", "ml", "nlp", "deep learning", "embedding",
+                "ranking", "retrieval", "recommendation", "recsys", "llm"}
     if arch == "generic_dev" and not _has(ctext, ml_terms):
         return 0
 
-    # Build up evidence points for genuine AI/ML candidates.
+    # Build up evidence points for genuine AI/ML candidates, from the career
+    # history (so aspirational summary keywords earn nothing).
     pts = 0
     retrieval = _has(ctext, {"retrieval", "ranking", "recommendation", "recsys",
-                             "search", "personalization", "relevance"})
+                             "personalization", "relevance", "semantic search"}) \
+        or _has(ctext, L.PLAIN_IR)
     if retrieval:
         pts += 2
     if _has(ctext, set(L.VECTOR_INFRA) | set(L.EMBED_MODELS) | {"embedding", "embeddings"}):
         pts += 1
     if _has(ctext, set(L.EVAL_TERMS)):
         pts += 1
+    # Analyst decoy: aspirational tell in summary and no real retrieval history.
+    if _has(stext, L.ANALYST_TELL) and not retrieval:
+        return min(2, 2 if arch == "core_ml" else 1)
     comps = " ".join([(p.get("current_company") or "").lower()] +
                      [(r.get("company") or "").lower() for r in cand.get("career_history", [])])
     product = any(f in comps for f in L.PRODUCT_FIRMS)

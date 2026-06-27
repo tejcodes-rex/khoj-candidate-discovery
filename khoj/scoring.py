@@ -56,19 +56,33 @@ NON_TECH = {
 WEIGHTS = {"career": 0.40, "skill_trust": 0.22, "title": 0.18, "experience": 0.20}
 
 
-def _hits(text, terms):
-    return {t for t in terms if t in text}
+from .match import hits as _hits  # word-boundary matching, not naive substring
 
 
-def _career_text(cand):
+def _history_text(cand):
+    """Only the DEMONSTRATED work: career-history titles and descriptions.
+
+    The summary is deliberately excluded. The dataset's decoys stuff retrieval
+    and ranking keywords into aspirational summary lines ("looking to grow into
+    ranking") while their actual roles are classification or analytics. Scoring
+    evidence on the career history only is what separates real builders from
+    keyword-stuffing analysts.
+    """
     parts = []
     for r in cand.get("career_history", []):
         parts.append((r.get("title") or "").lower())
         parts.append((r.get("description") or "").lower())
-    p = cand.get("profile", {})
-    parts.append((p.get("summary") or "").lower())
-    parts.append((p.get("headline") or "").lower())
     return " ".join(parts)
+
+
+def _summary_text(cand):
+    p = cand.get("profile", {})
+    return ((p.get("summary") or "") + " " + (p.get("headline") or "")).lower()
+
+
+def _career_text(cand):
+    """Full text, used only where aspirational mentions are acceptable."""
+    return _history_text(cand) + " " + _summary_text(cand)
 
 
 JUNIOR_MARKERS = ("junior", "intern", "trainee", "fresher", "entry level", "entry-level")
@@ -93,19 +107,22 @@ def _title_score(cand):
     return 0.30, "unrelated technical title"
 
 
-def _career_evidence(career_text):
-    ml = _hits(career_text, L.CORE_ML)
-    infra = _hits(career_text, L.VECTOR_INFRA)
-    embed = _hits(career_text, L.EMBED_MODELS)
-    evals = _hits(career_text, L.EVAL_TERMS)
-    prod = _hits(career_text, L.PRODUCTION)
-    raw = 1.0 * len(ml) + 1.6 * len(infra) + 1.6 * len(embed) + 1.2 * len(evals) + 0.4 * len(prod)
+def _career_evidence(history_text):
+    """Score demonstrated retrieval/ranking/ML work from the career history."""
+    ml = _hits(history_text, L.CORE_ML)
+    infra = _hits(history_text, L.VECTOR_INFRA)
+    embed = _hits(history_text, L.EMBED_MODELS)
+    evals = _hits(history_text, L.EVAL_TERMS)
+    prod = _hits(history_text, L.PRODUCTION)
+    plain = _hits(history_text, L.PLAIN_IR)   # plain-language retrieval/ranking work
+    raw = (1.0 * len(ml) + 1.6 * len(infra) + 1.6 * len(embed) + 1.2 * len(evals)
+           + 0.4 * len(prod) + 1.6 * len(plain))
     # Normalize so the full stack (retrieval + vector infra + embeddings + eval)
     # separates from partial evidence rather than everyone saturating at 1.0.
     # The JD wants to tell great from good, so resolution at the top matters.
     score = min(1.0, raw / 9.0)
     return score, {"ml": sorted(ml), "infra": sorted(infra), "embed": sorted(embed),
-                   "eval": sorted(evals), "production": bool(prod)}
+                   "eval": sorted(evals), "production": bool(prod), "plain": sorted(plain)}
 
 
 def _skill_trust(cand):
@@ -113,14 +130,16 @@ def _skill_trust(cand):
     assess = signals.get("skill_assessment_scores", {}) or {}
     trusted = []
     stuffed = 0
+    seen = set()
     for s in cand.get("skills", []):
         name = (s.get("name") or "").lower()
+        seen.add(name)
         if not _is_relevant_skill(name):
             continue
         endorse = min((s.get("endorsements", 0) or 0) / 20.0, 1.0)
         dur = min((s.get("duration_months", 0) or 0) / 24.0, 1.0)
         a = assess.get(s.get("name"))
-        a = (a / 100.0) if isinstance(a, (int, float)) else None
+        a = (a / 100.0) if isinstance(a, (int, float)) and not isinstance(a, bool) else None
         if a is None:
             trust = 0.5 * endorse + 0.5 * dur
         else:
@@ -129,6 +148,14 @@ def _skill_trust(cand):
             stuffed += 1
         else:
             trusted.append((s.get("name"), round(trust, 2)))
+    # A passed Redrob assessment is the strongest proof of real ability, so credit
+    # a relevant, well-scored assessment even when the skill is not in the list.
+    for skill_name, raw in assess.items():
+        nm = (skill_name or "").lower()
+        if nm in seen or not _is_relevant_skill(nm):
+            continue
+        if isinstance(raw, (int, float)) and not isinstance(raw, bool) and raw >= 60:
+            trusted.append((skill_name, round(0.4 * (raw / 100.0), 2)))
     # de-saturated like career evidence: a deep, well-endorsed skill set should
     # outrank a thin one rather than both capping at 1.0
     score = min(1.0, sum(t for _, t in trusted) / 5.0)
@@ -164,11 +191,12 @@ def score_candidate(cand, ablate=None):
 
     profile = cand.get("profile", {})
     yoe = float(profile.get("years_of_experience", 0) or 0)
-    career_text = _career_text(cand)
+    history_text = _history_text(cand)
+    summary_text = _summary_text(cand)
     skills_text = " ".join((s.get("name") or "").lower() for s in cand.get("skills", []))
 
     title, title_note = _title_score(cand)
-    career, career_detail = _career_evidence(career_text)
+    career, career_detail = _career_evidence(history_text)
     skill_trust, trusted_skills, n_stuffed = _skill_trust(cand)
     exp = _experience_fit(yoe)
 
@@ -189,9 +217,17 @@ def score_candidate(cand, ablate=None):
 
     # keyword stuffer: off-role title carrying a pile of AI skills
     current_title = (profile.get("current_title") or "").lower()
-    if any(n in current_title for n in NON_TECH) and len(trusted_skills) + n_stuffed >= 4:
+    if any(n in current_title for n in (NON_TECH | set(L.OFFROLE_TITLES))) \
+            and len(trusted_skills) + n_stuffed >= 4:
         mult *= 0.15
         penalties.append("AI skills listed under a non-technical role (keyword stuffer)")
+
+    # analyst decoy: keyword-rich summary but classical/analytics work. The tell
+    # phrases are templated markers of the dataset's 1,000 tier-2/3 analysts.
+    tells = _hits(summary_text, L.ANALYST_TELL)
+    if tells and career < 0.7:
+        mult *= 0.5
+        penalties.append("aspirational AI keywords without demonstrated retrieval/ranking work")
 
     # pure services career with no product-company experience
     comps = _companies(cand)
@@ -204,23 +240,28 @@ def score_candidate(cand, ablate=None):
     elif has_product:
         mult *= 1.05
 
-    # title-chaser: many short stints
+    # title-chaser: genuine rapid hopping only. The JD distrusts switching every
+    # ~1.5 years; we trigger below 16-month average and penalize mildly, so real
+    # builders with a couple of shorter stints are not destroyed.
     roles = cand.get("career_history", [])
     if len(roles) >= 4:
         avg_dur = sum(r.get("duration_months", 0) or 0 for r in roles) / len(roles)
-        if avg_dur < 20:
-            mult *= 0.65
+        if avg_dur < 16:
+            mult *= 0.8
             penalties.append(f"job-hopping pattern (avg tenure {avg_dur:.0f} months)")
 
-    # vision/speech/robotics focus without NLP/IR
-    cv = _hits(career_text + " " + skills_text, L.CV_SPEECH_ROBOTICS)
-    nlpir = _hits(career_text + " " + skills_text, L.NLP_IR)
-    if len(cv) >= 2 and not nlpir:
+    # vision/speech/robotics focus without NLP/IR. Reads the career history only
+    # (the skills list is noisy) and is waived by ANY genuine retrieval/ranking
+    # evidence, so a ranking builder who happens to list an image skill is spared.
+    cv = _hits(history_text, L.CV_SPEECH_ROBOTICS)
+    nlpir = _hits(history_text, L.NLP_IR)
+    if len(cv) >= 2 and not nlpir and not career_detail.get("plain"):
         mult *= 0.5
         penalties.append("vision/speech/robotics focus without NLP or retrieval")
 
     # pure research, no production
-    if ("research" in career_text or "phd" in career_text) and not career_detail["production"] and career < 0.3:
+    research = _hits(history_text, {"research", "phd", "academic", "publication", "thesis"})
+    if research and not career_detail["production"] and career < 0.3:
         mult *= 0.65
         penalties.append("research background with no production evidence")
 
@@ -299,8 +340,7 @@ def _location(cand):
     p = cand.get("profile", {})
     loc = (p.get("location") or "").lower()
     country = (p.get("country") or "").lower()
-    relocate = bool((cand.get("redrob_signals", {}) or {}).get("willing_to_relocate")) or \
-        cand.get("redrob_signals", {}).get("willing_to_relocate", False)
+    relocate = bool((cand.get("redrob_signals") or {}).get("willing_to_relocate"))
     if country == "india":
         # The JD prefers Pune/Noida but is explicit that it is flexible and
         # welcomes candidates across Indian metros, so a non-hub Indian city is

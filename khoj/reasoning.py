@@ -39,7 +39,7 @@ def _evidence_phrase(detail):
                 ("ranking", "retrieval", "recommendation", "search", "embedding",
                  "embeddings", "semantic search", "vector search", "personalization",
                  "learning to rank", "fine-tun")]
-    ordered = c["infra"] + c["embed"] + specific + c["eval"] + c["ml"]
+    ordered = c["infra"] + c["embed"] + c.get("plain", []) + specific + c["eval"] + c["ml"]
     seen, out = set(), []
     for t in ordered:
         ct = _clean(t)
