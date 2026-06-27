@@ -80,11 +80,6 @@ def _summary_text(cand):
     return ((p.get("summary") or "") + " " + (p.get("headline") or "")).lower()
 
 
-def _career_text(cand):
-    """Full text, used only where aspirational mentions are acceptable."""
-    return _history_text(cand) + " " + _summary_text(cand)
-
-
 JUNIOR_MARKERS = ("junior", "intern", "trainee", "fresher", "entry level", "entry-level")
 SENIOR_MARKERS = ("senior", "staff", "principal", "lead", "head of", "director")
 
@@ -193,7 +188,6 @@ def score_candidate(cand, ablate=None):
     yoe = float(profile.get("years_of_experience", 0) or 0)
     history_text = _history_text(cand)
     summary_text = _summary_text(cand)
-    skills_text = " ".join((s.get("name") or "").lower() for s in cand.get("skills", []))
 
     title, title_note = _title_score(cand)
     career, career_detail = _career_evidence(history_text)
@@ -222,10 +216,20 @@ def score_candidate(cand, ablate=None):
         mult *= 0.15
         penalties.append("AI skills listed under a non-technical role (keyword stuffer)")
 
-    # analyst decoy: keyword-rich summary but classical/analytics work. The tell
-    # phrases are templated markers of the dataset's 1,000 tier-2/3 analysts.
+    # analyst decoy: templated tell phrases plus NO substantive retrieval evidence.
+    # Genuine builders always have infra, embedding, eval, or plain-language
+    # retrieval work in their history; decoys only name-drop bare ML keywords. We
+    # gate on that substantive evidence rather than a keyword count, so a decoy
+    # that name-drops many ML words across several roles still cannot escape, and
+    # a real builder with moderate evidence is never wrongly demoted.
     tells = _hits(summary_text, L.ANALYST_TELL)
-    if tells and career < 0.7:
+    # Substantive evidence is a vector DB, an embedding model, an evaluation
+    # framework, or two-plus plain-language retrieval phrases. A single shallow
+    # mention ("ranking system") is not enough: the decoys name-drop exactly one
+    # while genuine builders show eval/infra/embedding and several plain phrases.
+    substantive = (career_detail["infra"] or career_detail["embed"]
+                   or career_detail["eval"] or len(career_detail["plain"]) >= 2)
+    if tells and not substantive:
         mult *= 0.5
         penalties.append("aspirational AI keywords without demonstrated retrieval/ranking work")
 

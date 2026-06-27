@@ -76,8 +76,9 @@ def main():
     # Pass 2: pull back just the finalists and attach reasoning.
     finalists = {}
     for cand in _iter(args.candidates):
-        if cand["candidate_id"] in top_ids:
-            finalists[cand["candidate_id"]] = cand
+        cid = cand["candidate_id"]
+        if cid in top_ids and cid not in finalists:  # keep the first occurrence
+            finalists[cid] = cand
             if len(finalists) == len(top_ids):
                 break
 

@@ -33,7 +33,7 @@ PLAIN_IR = {
     "query understanding", "embedding-based retrieval", "hybrid retrieval",
     "candidate generation", "two-tower", "two tower", "dense retrieval",
     "sparse retrieval", "index refresh", "embedding drift", "content matching",
-    "how content is represented", "intelligence layer", "relevance improvement",
+    "how content is represented", "relevance improvement",
 }
 
 # Vector databases and hybrid-search infrastructure the JD names explicitly.
@@ -44,7 +44,7 @@ VECTOR_INFRA = {
 
 # Embedding model families the JD lists as evidence of real retrieval work.
 EMBED_MODELS = {"sentence-transformer", "sentence transformers", "bge", "e5",
-                "openai embedding", "cohere embed", "instructor", "gte"}
+                "openai embedding", "cohere embed", "gte"}
 
 # Evaluation literacy the JD calls essential. ("map" dropped: too ambiguous even
 # on word boundaries; "mean average precision" covers it.)
@@ -120,21 +120,20 @@ NLP_IR = {"nlp", "natural language", "information retrieval", "retrieval",
 # Templated "tell" sentences that mark the dataset's 1,000 analyst decoys: people
 # who list AI keywords aspirationally but whose real work is classical modeling,
 # analytics, or classification. These phrases are near-exclusive to that class.
+# Tightened to decoy-exclusive, templated phrases. Generic ambition phrases like
+# "looking to grow into" were dropped because they also appear in genuine
+# profiles; the substantive-evidence gate in the scorer is the real safeguard.
 ANALYST_TELL = {
     "still building depth on the engineering",
     "strongest at the modeling and analysis side",
     "lighter on the deep-learning side",
     "production deployment was handled by the platform team",
     "my professional experience there is limited",
-    "beyond the surface level",
-    "looking to grow into",
-    "want to grow into",
-    "transitioning toward",
     "building competence on the ml side",
-    "interested in transitioning",
-    "lightweight deployment",
+    "interested in transitioning toward",
     "predictive modeling for customer",
     "dashboarding/analytics",
+    "lightweight deployment workflows",
 }
 
 # Indian metros the JD welcomes (Pune/Noida preferred; these are in scope).

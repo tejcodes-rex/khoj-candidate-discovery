@@ -55,7 +55,7 @@ def make_reasoning(cand, scored, rank):
     p = cand.get("profile", {})
     d = scored["detail"]
     comp = scored["components"]
-    title = p.get("current_title", "professional")
+    title = p.get("current_title") or "professional"
     yoe = d["yoe"]
     parts = []
 
