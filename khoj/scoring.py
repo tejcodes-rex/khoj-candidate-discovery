@@ -100,7 +100,10 @@ def _career_evidence(career_text):
     evals = _hits(career_text, L.EVAL_TERMS)
     prod = _hits(career_text, L.PRODUCTION)
     raw = 1.0 * len(ml) + 1.6 * len(infra) + 1.6 * len(embed) + 1.2 * len(evals) + 0.4 * len(prod)
-    score = min(1.0, raw / 6.0)
+    # Normalize so the full stack (retrieval + vector infra + embeddings + eval)
+    # separates from partial evidence rather than everyone saturating at 1.0.
+    # The JD wants to tell great from good, so resolution at the top matters.
+    score = min(1.0, raw / 9.0)
     return score, {"ml": sorted(ml), "infra": sorted(infra), "embed": sorted(embed),
                    "eval": sorted(evals), "production": bool(prod)}
 
@@ -126,7 +129,9 @@ def _skill_trust(cand):
             stuffed += 1
         else:
             trusted.append((s.get("name"), round(trust, 2)))
-    score = min(1.0, sum(t for _, t in trusted) / 3.0)
+    # de-saturated like career evidence: a deep, well-endorsed skill set should
+    # outrank a thin one rather than both capping at 1.0
+    score = min(1.0, sum(t for _, t in trusted) / 5.0)
     return score, trusted, stuffed
 
 
@@ -149,8 +154,12 @@ def _companies(cand):
     return out
 
 
-def score_candidate(cand):
-    """Return a dict: final score plus the full breakdown for reasoning."""
+def score_candidate(cand, ablate=None):
+    """Return a dict: final score plus the full breakdown for reasoning.
+
+    ablate (optional) neutralizes one signal so the evaluation harness can
+    measure how much that signal contributes. It does not affect normal scoring.
+    """
     is_hp, hp_reasons = detect_honeypot(cand)
 
     profile = cand.get("profile", {})
@@ -162,6 +171,15 @@ def score_candidate(cand):
     career, career_detail = _career_evidence(career_text)
     skill_trust, trusted_skills, n_stuffed = _skill_trust(cand)
     exp = _experience_fit(yoe)
+
+    if ablate == "career":
+        career = 0.5
+    elif ablate == "skill":
+        skill_trust = 0.5
+    elif ablate == "title":
+        title = 0.5
+    elif ablate == "experience":
+        exp = 0.5
 
     core = (WEIGHTS["career"] * career + WEIGHTS["skill_trust"] * skill_trust
             + WEIGHTS["title"] * title + WEIGHTS["experience"] * exp)
@@ -206,13 +224,19 @@ def score_candidate(cand):
         mult *= 0.65
         penalties.append("research background with no production evidence")
 
+    if ablate == "penalties":
+        mult = 1.0
     fit = max(0.0, min(1.0, core * mult))
 
     behavioral, beh_notes = _behavioral(cand)
     location, loc_note = _location(cand)
+    if ablate == "behavioral":
+        behavioral = 1.0
+    elif ablate == "location":
+        location = 1.0
 
     final = fit * behavioral * location
-    if is_hp:
+    if is_hp and ablate != "honeypot":
         final = 0.0
 
     return {
@@ -258,11 +282,14 @@ def _behavioral(cand):
     resp = float(s.get("recruiter_response_rate", 0) or 0)
     otw = 1.0 if s.get("open_to_work_flag") else 0.0
     icr = float(s.get("interview_completion_rate", 0) or 0)
-    m = 0.5 + 0.30 * recency + 0.12 * resp + 0.05 * otw + 0.03 * icr
+    # A gentle modifier, not a dominant factor. The signals doc calls these a
+    # "modifier on top of skill-match"; reachability refines the ranking among
+    # qualified people rather than overriding qualification.
+    m = 0.72 + 0.16 * recency + 0.07 * resp + 0.03 * otw + 0.02 * icr
     notice = s.get("notice_period_days", 0) or 0
     if notice > 90:
-        m *= 0.95
-    m = max(0.5, min(1.0, m))
+        m *= 0.97
+    m = max(0.7, min(1.0, m))
     notes = {"days_since_active": days, "open_to_work": bool(s.get("open_to_work_flag")),
              "response_rate": resp, "notice_period_days": notice}
     return m, notes
@@ -277,7 +304,7 @@ def _location(cand):
     if country == "india":
         if any(h in loc for h in L.INDIA_HUBS):
             return 1.0, f"in {p.get('location')}"
-        return 0.92, f"India ({p.get('location')})"
+        return 0.96, f"India ({p.get('location')})"
     if relocate:
-        return 0.8, f"{p.get('location')}, willing to relocate"
-    return 0.6, f"{p.get('location')}, no India base and not flagged to relocate"
+        return 0.85, f"{p.get('location')}, willing to relocate"
+    return 0.75, f"{p.get('location')}, no India base and not flagged to relocate"
