@@ -183,18 +183,49 @@ The second pass pulls back just the hundred finalists to attach reasoning. The
 output matches the required header and row count, and we run the organizers'
 `validate_submission.py` on it before every submission.
 
-## 9. Honest limitations and next steps
+## 9. How we validated and calibrated without the ground truth
 
-- The ground truth is hidden and there is no leaderboard, so we cannot tune against
-  the real labels. We validate by methodology, by inspecting the top 100 by hand,
-  and by checking trap and honeypot behaviour.
-- The disqualifier and trust thresholds are reasoned defaults, not learned. With a
-  small hand-labeled set we could calibrate them.
-- A lexical or embedding similarity signal could be added as one more component to
-  catch relevant experience phrased in words our lexicons miss.
-- The honeypot checks catch the impossibilities we can see in the data; some
-  honeypots likely use patterns that need fields we do not have, and we rely on the
-  scorer to avoid those.
+The competition hides the labels and runs no leaderboard, so we built our own
+measurement. `khoj/goldlabel.py` is an independent gold relevance labeler: a hard,
+tiered checklist (0 to 5) read straight from the JD and from the archetype
+structure we found in the data. It is deliberately built differently from the
+scorer (a checklist, not a weighted formula), so when the two agree it means
+something, and where they disagree we have a place to look.
+
+`evaluate_internal.py` then computes the exact official composite
+(0.50 NDCG@10 + 0.30 NDCG@50 + 0.15 MAP + 0.05 P@10) of our ranking against that
+gold, and ablates each signal to show its contribution.
+
+Two things this surfaced, and both were acted on:
+
+- The behavioral and location multipliers were too aggressive. The signals
+  document calls them a "modifier," but ours were swinging scores by up to half,
+  letting reachability override qualification. We softened both to gentle modifier
+  ranges. The JD intent is preserved; the dominance is gone.
+- The evidence and skill signals were saturating. Every qualified ML candidate hit
+  career = 1.0 and skill = 1.0, so "exceptional" and merely "good" candidates
+  collapsed to the same ceiling and behavioral noise decided the order. We
+  de-saturated both so the full stack (retrieval plus vector infra plus embeddings
+  plus eval literacy, the JD's hard requirements) separates from partial evidence.
+  This moved our internal NDCG@10 from 0.82 to 0.95 and made the top 10 entirely
+  tier-4 and tier-5 candidates.
+
+The honest caveat we keep front of mind: agreement with our own gold is not proof
+of agreement with the hidden ground truth. Both are faithful readings of the same
+JD. We deliberately did not chase the gold composite where it would have meant
+gutting career evidence (the JD's most explicitly stated signal), because that
+would be overfitting to our own labeler rather than to the JD. We trust the
+coverage and trap-avoidance checks (top 10 all ideal, zero stuffers, zero
+honeypots) more than the raw composite number.
+
+Remaining honest limitations:
+
+- Thresholds are reasoned and gold-calibrated, not learned from real labels.
+- A lexical or embedding similarity signal could catch fits phrased in words our
+  lexicons miss.
+- The honeypot checks catch the impossibilities visible in the data; some
+  honeypots likely need fields we do not have, and we rely on the scorer to avoid
+  those (it puts zero in the top 100).
 
 ## 10. Likely interview questions and the honest answers
 
