@@ -96,7 +96,7 @@ BODY = {
         "experience 6.0 years, mean recruiter response rate 0.74.",
         "A naive keyword-count ranking fills its top 100 with 85 keyword stuffers and 70 unreachable "
         "candidates. Ours has zero stuffers.",
-        "Against our own gold-labeler (the real labels are hidden): internal NDCG@10 of 0.95, and a "
+        "Against our own gold-labeler (the real labels are hidden): internal NDCG@10 of 0.96, and a "
         "top 10 made up entirely of ideal-tier candidates.",
         "Meets the brief: it ranks rather than filters, reads the JD deeply, integrates all three signal "
         "families, and is both fast and explainable.",

@@ -302,9 +302,12 @@ def _location(cand):
     relocate = bool((cand.get("redrob_signals", {}) or {}).get("willing_to_relocate")) or \
         cand.get("redrob_signals", {}).get("willing_to_relocate", False)
     if country == "india":
+        # The JD prefers Pune/Noida but is explicit that it is flexible and
+        # welcomes candidates across Indian metros, so a non-hub Indian city is
+        # barely nudged, not penalized. The real divide is India vs overseas.
         if any(h in loc for h in L.INDIA_HUBS):
             return 1.0, f"in {p.get('location')}"
-        return 0.96, f"India ({p.get('location')})"
+        return 0.99, f"India ({p.get('location')})"
     if relocate:
         return 0.85, f"{p.get('location')}, willing to relocate"
     return 0.75, f"{p.get('location')}, no India base and not flagged to relocate"

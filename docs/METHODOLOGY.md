@@ -207,7 +207,10 @@ Two things this surfaced, and both were acted on:
   collapsed to the same ceiling and behavioral noise decided the order. We
   de-saturated both so the full stack (retrieval plus vector infra plus embeddings
   plus eval literacy, the JD's hard requirements) separates from partial evidence.
-  This moved our internal NDCG@10 from 0.82 to 0.95 and made the top 10 entirely
+  We also found that an Indian city outside the named hubs was being penalized,
+  which dropped genuinely ideal candidates below hub-city weaker ones; the JD is
+  explicit that it is flexible on location, so we nearly neutralized that. Together
+  these moved our internal NDCG@10 from 0.82 to 0.96 and made the top 10 entirely
   tier-4 and tier-5 candidates.
 
 The honest caveat we keep front of mind: agreement with our own gold is not proof
