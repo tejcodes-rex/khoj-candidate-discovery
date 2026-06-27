@@ -35,7 +35,7 @@ BODY = {
         "What sets it apart: the job description is the rubric, skills are trust-weighted so keyword "
         "stuffers score near zero, behavioral availability is factored in, impossible honeypot profiles "
         "are excluded, and every pick comes with a grounded reason.",
-        "It ranks the whole pool in about 40 seconds on a laptop CPU with no network, where a system "
+        "It ranks the whole pool in well under two minutes on a laptop CPU with no network, where a system "
         "that calls a model per candidate cannot.",
     ],
     "JD Understanding & Candidate Evaluation": [
@@ -77,7 +77,7 @@ BODY = {
         "4. Exclude honeypots.",
         "5. Sort by score (ties broken by candidate id) and take the top 100.",
         "6. Generate a grounded reason for each and write the validator-compliant CSV.",
-        "One command, about 40 seconds, CPU only, fully offline.",
+        "One command, well under two minutes, CPU only, fully offline.",
     ],
     "System Architecture": [
         "Profiles  >  ingest and normalize  >  feature and signal extraction  >  four-component fit "
@@ -89,14 +89,14 @@ BODY = {
         "Standard library only, so it reproduces anywhere with no setup.",
     ],
     "Results & Performance": [
-        "Passes the official validator. Ranks 100,000 candidates in about 40 seconds, CPU only, no "
+        "Passes the official validator. Ranks 100,000 candidates in well under two minutes, CPU only, no "
         "network. The limit is 5 minutes.",
         "0 honeypots in the top 100. Disqualification is above 10 percent.",
         "Our top 100: 100 of 100 India-based, 0 keyword stuffers, 0 services-only careers, mean "
         "experience 6.0 years, mean recruiter response rate 0.74.",
         "A naive keyword-count ranking fills its top 100 with 85 keyword stuffers and 70 unreachable "
         "candidates. Ours has zero stuffers.",
-        "Against our own gold-labeler (the real labels are hidden): internal NDCG@10 of 0.90, with the "
+        "Against our own gold-labeler (the real labels are hidden): internal NDCG@10 of 0.92, with the "
         "top 10 led by genuine retrieval/ranking builders, not the dataset's keyword-stuffing decoys.",
         "Meets the brief: it ranks rather than filters, reads the JD deeply, integrates all three signal "
         "families, and is both fast and explainable.",
@@ -119,7 +119,7 @@ BODY = {
 }
 
 CLOSING = ("Khoj finds the engineers a keyword filter buries, and refuses the ones it would be "
-           "fooled by, in about 40 seconds, with a reason for every pick.")
+           "fooled by, in well under two minutes, with a reason for every pick.")
 
 
 def write_body(shape, lines, size=Pt(12)):

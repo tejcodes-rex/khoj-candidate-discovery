@@ -230,7 +230,7 @@ The honest caveat we keep front of mind: agreement with our own gold is not proo
 of agreement with the hidden ground truth, and we learned this the hard way. An
 earlier internal NDCG@10 of 0.96 was inflated because the gold labeler shared the
 substring bug and was rewarding the same decoys. With the bug fixed in both the
-scorer and the gold, the honest figure is 0.90, and the actual top ten is far
+scorer and the gold, the honest figure is 0.92, and the actual top ten is far
 better than it was at the inflated 0.96. We trust the profile-grounded checks (top
 ten led by genuine builders, decoys ejected, zero stuffers, zero honeypots) more
 than any single composite number, and we did not chase the gold where it would
