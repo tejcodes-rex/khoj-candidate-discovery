@@ -141,3 +141,67 @@ def test_tiebreak_orders_by_candidate_id_ascending():
     """Equal scores must be emitted candidate_id ascending (validator rule)."""
     pairs = sorted([(0.5, "CAND_0000020"), (0.5, "CAND_0000010")], key=lambda x: (-x[0], x[1]))
     assert [c for _, c in pairs] == ["CAND_0000010", "CAND_0000020"]
+
+
+# ---- regression tests for the multi-agent audit findings --------------------
+
+def test_word_boundary_matching_no_false_positives():
+    """'search' must not match 'research', 'rag' must not match 'storage'."""
+    from khoj.match import hits
+    assert hits("research lab work, scalable storage, average latency", {"search", "rag"}) == set()
+    assert hits("built semantic search and ranking in production", {"ranking", "production"}) == {"ranking", "production"}
+    assert hits("ml models served via html endpoints", {"ml"}) == {"ml"}
+
+
+def test_aspirational_analyst_ranks_below_real_builder():
+    """A decoy with retrieval keywords only in an aspirational summary must lose
+    to a builder whose career history shows the real work."""
+    builder = _cand("CAND_0000011", "Machine Learning Engineer", 7,
+                    [_skill("Ranking"), _skill("FAISS")],
+                    ["Shipped the ranking models for our discovery feed; owned the offline "
+                     "evaluation framework and online A/B tests. Built embedding-based retrieval."])
+    builder["profile"]["summary"] = "Built ranking and retrieval systems in production."
+    decoy = _cand("CAND_0000012", "AI Research Engineer", 7,
+                  [_skill("Ranking"), _skill("FAISS")],
+                  ["Built NLP pipelines for sentiment analysis and document classification."])
+    decoy["profile"]["summary"] = ("Data scientist with predictive modeling; I'm strongest at the "
+                                   "modeling and analysis side and looking to grow into ranking and retrieval.")
+    assert score_candidate(builder)["final"] > score_candidate(decoy)["final"]
+
+
+def test_ranking_builder_not_hit_by_cv_penalty():
+    """A retrieval/ranking builder who happens to list one image skill must not be
+    penalized as a vision-only candidate."""
+    c = _cand("CAND_0000013", "Senior AI Engineer", 7,
+              [_skill("Image Classification"), _skill("Ranking")],
+              ["Designed the ranking layer and personalization infrastructure; built "
+               "embedding-based retrieval and the offline evaluation framework."])
+    s = score_candidate(c)
+    assert "vision/speech/robotics focus without NLP or retrieval" not in s["detail"]["penalties"]
+
+
+def test_null_redrob_signals_does_not_crash():
+    c = _cand("CAND_0000014", "ML Engineer", 7, [_skill("NLP")], ["Built ranking systems."])
+    c["redrob_signals"] = None
+    score_candidate(c)  # must not raise
+
+
+def test_rank_py_dedups_duplicate_ids(tmp_path):
+    """Duplicate candidate ids in the input must not produce duplicate output rows."""
+    import json
+    from rank import _iter  # noqa: F401  (ensures importable)
+    recs = []
+    for i in range(1, 60):
+        r = _cand(f"CAND_{i:07d}", "ML Engineer", 7, [_skill("NLP"), _skill("FAISS")],
+                  ["Built ranking and retrieval systems in production."])
+        recs.append(r)
+    recs.append(dict(recs[0]))  # a duplicate id
+    src = tmp_path / "c.jsonl"
+    with open(src, "w", encoding="utf-8") as f:
+        for r in recs:
+            f.write(json.dumps(r) + "\n")
+    out = tmp_path / "team.csv"
+    subprocess.run([sys.executable, str(ROOT / "rank.py"), "--candidates", str(src),
+                    "--out", str(out), "--top", "50"], capture_output=True, text=True, cwd=str(ROOT))
+    ids = [row["candidate_id"] for row in csv.DictReader(open(out, encoding="utf-8"))]
+    assert len(ids) == len(set(ids))  # no duplicate ids

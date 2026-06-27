@@ -213,13 +213,28 @@ Two things this surfaced, and both were acted on:
   these moved our internal NDCG@10 from 0.82 to 0.96 and made the top 10 entirely
   tier-4 and tier-5 candidates.
 
+The deepest fix came from reading the data adversarially. The pool contains 1,000
+"analyst" decoys whose summaries are stuffed with aspirational keywords ("looking
+to grow into ranking and retrieval") while their actual career history is
+classical modeling or classification, and exactly 8 "plain-language" tier-5
+builders who describe real retrieval systems without buzzwords ("the ranking
+layer", "connect users with relevant information at scale"). Two corrections
+followed: we now score evidence from the career history only, not the aspirational
+summary, and we match terms on word boundaries (the old code let "search" match
+inside "research", handing retrieval credit to the exact researchers the JD
+rejects). Before these fixes, six of our top ten were analyst decoys and none of
+the eight elite builders were in the top ten. After, the decoys are gone and the
+genuine and elite builders lead.
+
 The honest caveat we keep front of mind: agreement with our own gold is not proof
-of agreement with the hidden ground truth. Both are faithful readings of the same
-JD. We deliberately did not chase the gold composite where it would have meant
-gutting career evidence (the JD's most explicitly stated signal), because that
-would be overfitting to our own labeler rather than to the JD. We trust the
-coverage and trap-avoidance checks (top 10 all ideal, zero stuffers, zero
-honeypots) more than the raw composite number.
+of agreement with the hidden ground truth, and we learned this the hard way. An
+earlier internal NDCG@10 of 0.96 was inflated because the gold labeler shared the
+substring bug and was rewarding the same decoys. With the bug fixed in both the
+scorer and the gold, the honest figure is 0.90, and the actual top ten is far
+better than it was at the inflated 0.96. We trust the profile-grounded checks (top
+ten led by genuine builders, decoys ejected, zero stuffers, zero honeypots) more
+than any single composite number, and we did not chase the gold where it would
+have meant gutting career evidence, the JD's most explicitly stated signal.
 
 Remaining honest limitations:
 
