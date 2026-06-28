@@ -47,7 +47,7 @@ BODY = {
         "hybrid search operations, strong Python, ranking evaluation literacy (NDCG, MRR, MAP), 6 to 8 "
         "years ideal, applied ML at product (not services) companies, an India hub or willingness to "
         "relocate (Pune/Noida preferred), and a shipped end to end ranking, search or recommendation system.",
-        "Named disqualifiers we also read from the JD: keyword stuffers, services only careers, title-"
+        "Named disqualifiers we also read from the JD: keyword stuffers, services only careers, title "
         "chasing job hoppers, vision/speech only without NLP or IR, and pure research without production.",
         "Most important signals, and how we judge fit beyond keywords: career history evidence of "
         "retrieval/ranking/recsys work (weighted highest), trust weighted skills, and behavioral "
@@ -57,13 +57,13 @@ BODY = {
     ],
     "Technologies Used": [
         "Python 3.12, standard library only in the ranking path (no third party packages): chosen to meet "
-        "the 5-minute CPU reproduction limit, to scale to a real 200,000-plus pool, and so judges reproduce "
+        "the five minute CPU reproduction limit, to scale to a real 200,000 plus pool, and so judges reproduce "
         "it with zero setup.",
         "A custom word boundary matcher, a hand built skill ontology, and a transparent rule based scorer: "
         "chosen over an embedding model because embeddings reward the keyword stuffing the JD warns about "
         "and cannot explain themselves.",
         "Streamlit for the hosted sandbox demo; pytest for the test suite, including a test that runs the "
-        "organizers' own validator; Docker for reproducible Stage-3 runs; Git for authentic, incremental "
+        "organizers' own validator; Docker for reproducible Stage 3 runs; Git for authentic, incremental "
         "history.",
         "No GPU, no network, and no per candidate model calls anywhere in the ranking path, by design.",
     ],
@@ -195,6 +195,14 @@ def main():
 
     # Closing slide: the template already has its own "Thank You" design, so we
     # leave it clean and do not clutter it.
+
+    # Soften the one hyphen in a template heading, preserving its formatting.
+    for slide in slides:
+        for sh in slide.shapes:
+            if sh.has_text_frame and "End-to-End" in sh.text_frame.text:
+                for para in sh.text_frame.paragraphs:
+                    for run in para.runs:
+                        run.text = run.text.replace("End-to-End", "End to End")
 
     prs.save(OUT)
     print(f"Saved {OUT} with {len(slides)} slides, 5 diagrams, and the Khoj logo.")
