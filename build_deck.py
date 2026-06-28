@@ -67,14 +67,18 @@ BODY = {
         "history.",
         "No GPU, no network, and no per candidate model calls anywhere in the ranking path, by design.",
     ],
-    "Submission Assets": [
-        "GitHub repository: https://github.com/tejcodes-rex/khoj-candidate-discovery",
-        "Live sandbox (Google Colab, runs end to end on a sample): https://colab.research.google.com/github/tejcodes-rex/khoj-candidate-discovery/blob/main/sandbox.ipynb",
-        "Reproduce command: python rank.py --candidates ./candidates.jsonl --out ./submission.csv",
-        "Ranked output CSV: passes the official validator (\"Submission is valid.\"), 0 honeypots in the top 100.",
-        "Docs in the repo: README, a full methodology walkthrough (docs/METHODOLOGY.md), and the test suite.",
-    ],
 }
+
+# The Submission Assets slide is handled specially so the long URLs sit on their
+# own lines and are real clickable hyperlinks (a wrapped URL loses its hyphen when
+# copied out of the PDF).
+ASSETS = [
+    ("GitHub repository", "https://github.com/tejcodes-rex/khoj-candidate-discovery"),
+    ("Live sandbox (Google Colab)", "https://colab.research.google.com/github/tejcodes-rex/khoj-candidate-discovery/blob/main/sandbox.ipynb"),
+    ("Reproduce command", "python rank.py --candidates ./candidates.jsonl --out ./submission.csv"),
+    ("Ranked output", "passes the official validator, with 0 honeypots in the top 100."),
+    ("Docs in the repo", "README, a full methodology walkthrough, and the test suite."),
+]
 
 # Slides whose answer IS a diagram. Optional one-line caption above the image.
 IMAGES = {
@@ -103,6 +107,42 @@ def write_body(shape, lines, size=Pt(12)):
         run.font.size = size
         run.font.name = "Calibri"
         run.font.color.rgb = INK
+
+
+def write_assets(shape, items):
+    """Labels with their values, where http values get their own line as a real
+    clickable hyperlink, so a long URL never wraps and loses a character."""
+    tf = shape.text_frame
+    tf.word_wrap = True
+    tf.clear()
+    first = True
+    for label, value in items:
+        is_url = value.startswith("http")
+        # label paragraph
+        p = tf.paragraphs[0] if first else tf.add_paragraph()
+        first = False
+        p.space_before = Pt(4)
+        r = p.add_run()
+        r.text = label + ":"
+        r.font.size = Pt(12)
+        r.font.bold = True
+        r.font.name = "Calibri"
+        r.font.color.rgb = INK
+        if not is_url:
+            r2 = p.add_run()
+            r2.text = " " + value
+            r2.font.size = Pt(12)
+            r2.font.name = "Calibri"
+            r2.font.color.rgb = INK
+        else:
+            # URL on its own line, smaller, hyperlinked
+            pu = tf.add_paragraph()
+            ru = pu.add_run()
+            ru.text = value
+            ru.font.size = Pt(10)
+            ru.font.name = "Consolas"
+            ru.font.color.rgb = RGBColor(0x1E, 0x40, 0xC0)
+            ru.hyperlink.address = value
 
 
 def body_box(slide):
@@ -137,7 +177,10 @@ def main():
         title = boxes[0].text_frame.text.strip()
         body = boxes[-1] if len(boxes) >= 2 else None
 
-        if title in BODY:
+        if title == "Submission Assets" and body is not None:
+            write_assets(body, ASSETS)
+
+        elif title in BODY:
             n = len(BODY[title])
             write_body(body, BODY[title], size=Pt(12 if n > 3 else 13))
 
