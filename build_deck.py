@@ -69,7 +69,7 @@ BODY = {
     ],
     "Submission Assets": [
         "GitHub repository: https://github.com/tejcodes-rex/khoj-candidate-discovery",
-        "Live sandbox demo: TODO_sandbox_url",
+        "Live sandbox (Google Colab, runs end to end on a sample): https://colab.research.google.com/github/tejcodes-rex/khoj-candidate-discovery/blob/main/sandbox.ipynb",
         "Reproduce command: python rank.py --candidates ./candidates.jsonl --out ./submission.csv",
         "Ranked output CSV: passes the official validator (\"Submission is valid.\"), 0 honeypots in the top 100.",
         "Docs in the repo: README, a full methodology walkthrough (docs/METHODOLOGY.md), and the test suite.",
