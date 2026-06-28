@@ -1,0 +1,24 @@
+<svg width="1280" height="470" viewBox="0 0 1280 470" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <rect width="1280" height="470" fill="#FFFFFF"/>
+  <text x="40" y="38" font-size="19" font-weight="700" fill="#1E2A78">Every one of the 100 rows carries a grounded, one-line reason, built only from the candidate's own fields</text>
+
+  <!-- the reasoning card -->
+  <rect x="40" y="62" width="1200" height="150" rx="14" fill="#F4F6FB" stroke="#3B5BFF" stroke-width="2"/>
+  <text x="64" y="96" font-size="15" fill="#9aa3b2">rank 1  ·  CAND_0046525  ·  score 0.9878</text>
+  <text x="64" y="132" font-size="20" font-weight="600" fill="#14161F">"Senior Machine Learning Engineer with 6.1 yrs; career history shows BM25, FAISS, HNSW;</text>
+  <text x="64" y="162" font-size="20" font-weight="600" fill="#14161F">8 trust-verified skills (Elasticsearch, Machine Learning, Information Retrieval);</text>
+  <text x="64" y="192" font-size="20" font-weight="600" fill="#14161F">active 25d ago, response rate 88%."</text>
+
+  <!-- annotations -->
+  <g font-size="15">
+    <circle cx="60" cy="250" r="6" fill="#1FAA6E"/><text x="76" y="255" fill="#14161F"><tspan font-weight="700">Specific facts:</tspan> years, named skills, and signal values, never generic praise.</text>
+    <circle cx="60" cy="284" r="6" fill="#1FAA6E"/><text x="76" y="289" fill="#14161F"><tspan font-weight="700">JD connection:</tspan> the evidence cited (BM25, FAISS) maps to the JD's hard requirements.</text>
+    <circle cx="60" cy="318" r="6" fill="#1FAA6E"/><text x="76" y="323" fill="#14161F"><tspan font-weight="700">No hallucination by construction:</tspan> terms are drawn from the career history only, so the reason can never claim a skill the profile lacks.</text>
+    <circle cx="60" cy="352" r="6" fill="#1FAA6E"/><text x="76" y="357" fill="#14161F"><tspan font-weight="700">Honest concerns surfaced:</tspan> gaps, long notice periods, or low activity are stated plainly, and the tone matches the rank.</text>
+  </g>
+
+  <!-- data validation strip -->
+  <rect x="40" y="382" width="1200" height="70" rx="12" fill="#1E2A78"/>
+  <text x="64" y="412" font-size="16" font-weight="700" fill="#FFFFFF">Handling messy &amp; suspicious data:</text>
+  <text x="64" y="436" font-size="15" fill="#FFD45A">word-boundary matching (no false skills) · trust-weighted skills defeat keyword stuffing · honeypots (impossible profiles) detected and excluded · robust to missing fields</text>
+</svg>

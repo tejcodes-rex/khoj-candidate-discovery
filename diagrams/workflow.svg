@@ -1,0 +1,76 @@
+<svg width="1280" height="560" viewBox="0 0 1280 560" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="aw" markerWidth="12" markerHeight="12" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#3B5BFF"/>
+    </marker>
+  </defs>
+  <rect width="1280" height="560" fill="#FFFFFF"/>
+
+  <!-- in / out labels -->
+  <text x="48" y="44" font-size="18" font-weight="700" fill="#5B6472">IN: job description + 100,000 candidate profiles</text>
+  <text x="1232" y="44" font-size="18" font-weight="700" fill="#157A4F" text-anchor="end">OUT: validator-clean top-100 CSV</text>
+
+  <!-- 5 stage cards -->
+  <!-- card template via groups -->
+  <g>
+    <!-- 1 -->
+    <rect x="40" y="70" width="226" height="410" rx="16" fill="#F4F6FB" stroke="#D8DEEC" stroke-width="2"/>
+    <circle cx="72" cy="104" r="20" fill="#1E2A78"/><text x="72" y="111" font-size="20" font-weight="700" fill="#FFFFFF" text-anchor="middle">1</text>
+    <text x="104" y="111" font-size="19" font-weight="700" fill="#1E2A78">Understand</text>
+    <text x="64" y="160" font-size="15" fill="#14161F">Parse the JD into:</text>
+    <text x="64" y="190" font-size="15" fill="#5B6472">• must / nice-to-have skills</text>
+    <text x="64" y="216" font-size="15" fill="#5B6472">• experience band 6-8 yrs</text>
+    <text x="64" y="242" font-size="15" fill="#5B6472">• seniority &amp; location</text>
+    <text x="64" y="268" font-size="15" fill="#5B6472">• the named disqualifiers</text>
+
+    <!-- 2 -->
+    <rect x="296" y="70" width="226" height="410" rx="16" fill="#F4F6FB" stroke="#D8DEEC" stroke-width="2"/>
+    <circle cx="328" cy="104" r="20" fill="#1E2A78"/><text x="328" y="111" font-size="20" font-weight="700" fill="#FFFFFF" text-anchor="middle">2</text>
+    <text x="360" y="111" font-size="19" font-weight="700" fill="#1E2A78">Ingest</text>
+    <text x="320" y="160" font-size="15" fill="#14161F">Stream 100k profiles</text>
+    <text x="320" y="190" font-size="15" fill="#5B6472">• normalize messy fields</text>
+    <text x="320" y="216" font-size="15" fill="#5B6472">• word-boundary matching</text>
+    <text x="320" y="242" font-size="15" fill="#5B6472">• dedup candidate ids</text>
+    <text x="320" y="268" font-size="15" fill="#5B6472">• survive missing data</text>
+
+    <!-- 3 -->
+    <rect x="552" y="70" width="226" height="410" rx="16" fill="#EEF2FF" stroke="#3B5BFF" stroke-width="2"/>
+    <circle cx="584" cy="104" r="20" fill="#3B5BFF"/><text x="584" y="111" font-size="20" font-weight="700" fill="#FFFFFF" text-anchor="middle">3</text>
+    <text x="616" y="111" font-size="19" font-weight="700" fill="#1E2A78">Score</text>
+    <text x="576" y="160" font-size="15" fill="#14161F">Per candidate, from</text>
+    <text x="576" y="180" font-size="15" fill="#14161F">career history:</text>
+    <text x="576" y="212" font-size="15" fill="#5B6472">• career evidence  0.40</text>
+    <text x="576" y="238" font-size="15" fill="#5B6472">• skill trust  0.22</text>
+    <text x="576" y="264" font-size="15" fill="#5B6472">• title  0.18</text>
+    <text x="576" y="290" font-size="15" fill="#5B6472">• experience  0.20</text>
+
+    <!-- 4 -->
+    <rect x="808" y="70" width="226" height="410" rx="16" fill="#FFF4E8" stroke="#FFB020" stroke-width="2"/>
+    <circle cx="840" cy="104" r="20" fill="#B25A00"/><text x="840" y="111" font-size="20" font-weight="700" fill="#FFFFFF" text-anchor="middle">4</text>
+    <text x="872" y="111" font-size="19" font-weight="700" fill="#B25A00">Refine</text>
+    <text x="832" y="160" font-size="15" fill="#14161F">Adjust the fit:</text>
+    <text x="832" y="190" font-size="15" fill="#8A5A1A">• × behavioral availability</text>
+    <text x="832" y="216" font-size="15" fill="#8A5A1A">• × location</text>
+    <text x="832" y="242" font-size="15" fill="#8A5A1A">• disqualifier penalties</text>
+    <text x="832" y="268" font-size="15" fill="#8A5A1A">• exclude honeypots → 0</text>
+
+    <!-- 5 -->
+    <rect x="1064" y="70" width="216" height="410" rx="16" fill="#E9F7F0" stroke="#1FAA6E" stroke-width="2"/>
+    <circle cx="1096" cy="104" r="20" fill="#157A4F"/><text x="1096" y="111" font-size="20" font-weight="700" fill="#FFFFFF" text-anchor="middle">5</text>
+    <text x="1128" y="111" font-size="19" font-weight="700" fill="#157A4F">Rank</text>
+    <text x="1088" y="160" font-size="15" fill="#14161F">Sort score desc,</text>
+    <text x="1088" y="180" font-size="15" fill="#14161F">id asc (tie-break)</text>
+    <text x="1088" y="212" font-size="15" fill="#5B6472">• take top 100</text>
+    <text x="1088" y="238" font-size="15" fill="#5B6472">• grounded reasoning</text>
+    <text x="1088" y="264" font-size="15" fill="#5B6472">• write the CSV</text>
+    <text x="1088" y="290" font-size="15" fill="#5B6472">• pass the validator</text>
+  </g>
+
+  <!-- arrows between cards -->
+  <line x1="268" y1="275" x2="294" y2="275" stroke="#3B5BFF" stroke-width="4" marker-end="url(#aw)"/>
+  <line x1="524" y1="275" x2="550" y2="275" stroke="#3B5BFF" stroke-width="4" marker-end="url(#aw)"/>
+  <line x1="780" y1="275" x2="806" y2="275" stroke="#3B5BFF" stroke-width="4" marker-end="url(#aw)"/>
+  <line x1="1036" y1="275" x2="1062" y2="275" stroke="#3B5BFF" stroke-width="4" marker-end="url(#aw)"/>
+
+  <text x="640" y="528" font-size="16" font-weight="600" fill="#5B6472" text-anchor="middle">One command, fully offline, CPU only, about 100 seconds for the whole 100,000-candidate pool.</text>
+</svg>

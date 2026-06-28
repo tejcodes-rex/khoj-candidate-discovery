@@ -1,16 +1,15 @@
 """
-Fill the mandatory Redrob deck template with our content.
+Fill the mandatory Redrob deck template with our content AND real diagrams.
 
-The template ("Idea Submission Template _ Redrob.pptx") must be used as-is, so we
-load it and write into its existing prompt boxes, never touching the titles or the
-background. Slides that have only a title (architecture, closing) get a new body
-box that matches the template's dark text on its light background.
-
-Output: "Khoj_Redrob_Submission_Deck.pptx". Review it, fill the TODOs on slides 1
-and 10, then export to PDF (under 5 MB).
+The template ("submission/Idea Submission Template _ Redrob.pptx") must be used
+as-is, so we load it and write into its existing prompt boxes, never touching the
+titles or the background. Slides that ask for a diagram (architecture, workflow,
+methodology, explainability, results) get an actual rendered diagram image, not
+text and symbols. The title and closing slides get the Khoj logo.
 
     pip install python-pptx
     python build_deck.py
+Then export "Khoj_Redrob_Submission_Deck.pptx" to PDF (handled separately).
 """
 
 from pptx import Presentation
@@ -18,9 +17,9 @@ from pptx.enum.shapes import MSO_SHAPE_TYPE
 from pptx.dml.color import RGBColor
 from pptx.util import Pt, Inches
 
-TEMPLATE = "Idea Submission Template _ Redrob.pptx"
+TEMPLATE = "submission/Idea Submission Template _ Redrob.pptx"
 OUT = "Khoj_Redrob_Submission_Deck.pptx"
-INK = RGBColor(0x20, 0x27, 0x29)  # the template's text color
+INK = RGBColor(0x20, 0x27, 0x29)
 
 IDENTITY = {
     "Team Name :": "Team Name : Khoj",
@@ -28,98 +27,69 @@ IDENTITY = {
     "Problem Statement :": "Problem Statement : Intelligent Candidate Discovery (Data and AI Challenge)",
 }
 
+# Slides answered in text (precise answers to every question on the slide).
 BODY = {
     "Solution Overview": [
-        "Khoj ranks the best-fit candidates for the Senior AI Engineer role out of 100,000 profiles.",
-        "It reads what each person actually built in their career history, not the keywords they listed.",
-        "What sets it apart: the job description is the rubric, skills are trust-weighted so keyword "
-        "stuffers score near zero, behavioral availability is factored in, impossible honeypot profiles "
-        "are excluded, and every pick comes with a grounded reason.",
-        "It ranks the whole pool in well under two minutes on a laptop CPU with no network, where a system "
-        "that calls a model per candidate cannot.",
+        "Khoj is an AI candidate-discovery engine that ranks the 100 best-fit candidates for the Senior "
+        "AI Engineer role out of 100,000 profiles, with a grounded reason for every pick.",
+        "It reads what each person actually built in their career history, not the keywords they pasted "
+        "into a summary or skills list.",
+        "What differentiates it from traditional matching: keyword filters and embed-and-cosine systems "
+        "reward keyword stuffing and miss plainly-worded talent. Khoj instead scores demonstrated career "
+        "evidence over surface keywords, trust-weights skills by endorsements, time used and assessment "
+        "scores, factors in whether a candidate is actually reachable, detects and excludes impossible "
+        "\"honeypot\" profiles, and explains every decision.",
+        "It is transparent and fast: rule-based, the whole pool in under two minutes on a CPU with no "
+        "network, where a system that calls a model per candidate cannot.",
     ],
     "JD Understanding & Candidate Evaluation": [
-        "Key requirements read from the JD: production embeddings and retrieval, vector-database and "
-        "hybrid-search experience, strong Python, ranking-evaluation literacy (NDCG, MRR, MAP), 6 to 8 "
-        "years ideal, product-company background, an India hub or willingness to relocate.",
-        "Most important signals: career-history evidence of retrieval, ranking and recommendation work "
-        "(weighted highest); skills trust-weighted by endorsements, months used and assessment scores; "
-        "behavioral availability such as recent activity, recruiter response rate and open-to-work.",
-        "Explicit disqualifiers applied: off-role keyword stuffers, services-only careers, job-hoppers, "
-        "vision or speech-only profiles, and pure-research backgrounds with no production work.",
-    ],
-    "Ranking Methodology": [
-        "Fit score from four weighted parts: career evidence 0.40, skill trust 0.22, title 0.18, "
-        "experience 0.20.",
-        "Two multipliers then scale it: behavioral availability and location.",
-        "Named JD disqualifiers apply real penalties, and honeypots are forced to a score of zero.",
-        "We chose transparent rule-based scoring over embedding similarity for three reasons: similarity "
-        "rewards the keyword stuffing the JD warns about, the 5-minute CPU budget rules out per-candidate "
-        "models, and we must be able to explain every rank.",
-        "Output is sorted by score then candidate id, which guarantees the validator's tie-break rule.",
-        "Because the ground truth is hidden, we built an independent gold-labeler and an offline NDCG "
-        "harness to validate and calibrate the weights, with ablations proving each signal earns its place.",
-    ],
-    "Explainability & Data Validation": [
-        "Each of the 100 rows carries a one-line reason built only from the candidate's own fields and "
-        "the score breakdown: title, years, the specific career evidence, the trust-verified skills, and "
-        "the activity signals.",
-        "Honest concerns are surfaced and the tone matches the rank; nothing is templated.",
-        "Hallucination is prevented by construction: a reason can only cite values that exist in the "
-        "profile, and skill matching is word-boundary based so no false skills are attributed.",
-        "Honeypots, the internally-impossible profiles, are detected by consistency checks and kept out "
-        "of the shortlist entirely.",
-    ],
-    "End-to-End Workflow": [
-        "1. Read candidates.jsonl, streamed and parsed line by line.",
-        "2. Score each candidate: career evidence, skill trust, title, experience.",
-        "3. Apply disqualifier penalties, then behavioral and location multipliers.",
-        "4. Exclude honeypots.",
-        "5. Sort by score (ties broken by candidate id) and take the top 100.",
-        "6. Generate a grounded reason for each and write the validator-compliant CSV.",
-        "One command, well under two minutes, CPU only, fully offline.",
-    ],
-    "System Architecture": [
-        "Profiles  >  ingest and normalize  >  feature and signal extraction  >  four-component fit "
-        "score  >  behavioral and location multipliers  >  honeypot guard  >  ranked top 100 with "
-        "reasoning.",
-        "",
-        "Modules: lexicons (the JD encoded as terms), scoring (the core), honeypot (consistency checks), "
-        "reasoning (grounded explanations), and rank.py (the entrypoint).",
-        "Standard library only, so it reproduces anywhere with no setup.",
-    ],
-    "Results & Performance": [
-        "Passes the official validator. Ranks 100,000 candidates in well under two minutes, CPU only, no "
-        "network. The limit is 5 minutes.",
-        "0 honeypots in the top 100. Disqualification is above 10 percent.",
-        "Our top 100: 100 of 100 India-based, 0 keyword stuffers, 0 services-only careers, mean "
-        "experience 6.0 years, mean recruiter response rate 0.74.",
-        "A naive keyword-count ranking fills its top 100 with 85 keyword stuffers and 70 unreachable "
-        "candidates. Ours has zero stuffers.",
-        "Against our own gold-labeler (the real labels are hidden): internal NDCG@10 of 0.92, with the "
-        "top 10 led by genuine retrieval/ranking builders, not the dataset's keyword-stuffing decoys.",
-        "Meets the brief: it ranks rather than filters, reads the JD deeply, integrates all three signal "
-        "families, and is both fast and explainable.",
+        "Key requirements extracted from the JD: production embeddings and retrieval, vector-database or "
+        "hybrid-search operations, strong Python, ranking-evaluation literacy (NDCG, MRR, MAP), 6 to 8 "
+        "years ideal, applied ML at product (not services) companies, an India hub or willingness to "
+        "relocate (Pune/Noida preferred), and a shipped end-to-end ranking, search or recommendation system.",
+        "Named disqualifiers we also read from the JD: keyword stuffers, services-only careers, title-"
+        "chasing job-hoppers, vision/speech-only without NLP or IR, and pure research without production.",
+        "Most important signals, and how we judge fit beyond keywords: career-history evidence of "
+        "retrieval/ranking/recsys work (weighted highest), trust-weighted skills, and behavioral "
+        "availability. Because we read the demonstrated work, a strong candidate who built a recommendation "
+        "system in plain words ranks high without the buzzwords, while a Marketing Manager who pasted AI "
+        "skills ranks near zero.",
     ],
     "Technologies Used": [
-        "Python 3.12, standard library only for the ranker: no GPU, no network, no paid APIs. Chosen to "
-        "meet the 5-minute CPU reproduction limit and to scale to a real 200,000-plus production pool.",
-        "Streamlit for the hosted sandbox demo.",
-        "pytest for the test suite, including a test that runs the organizers' own validator.",
-        "Git for authentic, incremental development history.",
-        "No per-candidate model calls anywhere in the ranking path, by design.",
+        "Python 3.12, standard library only in the ranking path (no third-party packages): chosen to meet "
+        "the 5-minute CPU reproduction limit, to scale to a real 200,000-plus pool, and so judges reproduce "
+        "it with zero setup.",
+        "A custom word-boundary matcher, a hand-built skill ontology, and a transparent rule-based scorer: "
+        "chosen over an embedding model because embeddings reward the keyword stuffing the JD warns about "
+        "and cannot explain themselves.",
+        "Streamlit for the hosted sandbox demo; pytest for the test suite, including a test that runs the "
+        "organizers' own validator; Docker for reproducible Stage-3 runs; Git for authentic, incremental "
+        "history.",
+        "No GPU, no network, and no per-candidate model calls anywhere in the ranking path, by design.",
     ],
     "Submission Assets": [
-        "GitHub repository: TODO_repo_url",
+        "GitHub repository: TODO_repo_url  (public)",
         "Live sandbox demo: TODO_sandbox_url",
         "Reproduce command: python rank.py --candidates ./candidates.jsonl --out ./submission.csv",
-        "Validator: passes with \"Submission is valid.\"",
-        "Docs in the repo: README, a full methodology walkthrough, and the test suite.",
+        "Ranked output CSV: passes the official validator (\"Submission is valid.\"), 0 honeypots in the top 100.",
+        "Docs in the repo: README, a full methodology walkthrough (docs/METHODOLOGY.md), and the test suite.",
     ],
 }
 
-CLOSING = ("Khoj finds the engineers a keyword filter buries, and refuses the ones it would be "
-           "fooled by, in well under two minutes, with a reason for every pick.")
+# Slides whose answer IS a diagram. Optional one-line caption above the image.
+IMAGES = {
+    "Ranking Methodology": ("diagrams/scoring.png",
+        "Two stages, fully transparent: read demonstrated work, score four weighted components, refine with "
+        "two multipliers, apply named penalties, exclude honeypots, then sort."),
+    "Explainability & Data Validation": ("diagrams/reasoning.png",
+        "Every pick is explained from the candidate's own fields; messy and impossible profiles are handled by construction."),
+    "End-to-End Workflow": ("diagrams/workflow.png", None),
+    "System Architecture": ("diagrams/architecture.png", None),
+    "Results & Performance": ("diagrams/results.png", None),
+}
+
+CLOSING = ("Khoj finds the engineers a keyword filter buries, refuses the ones it would be fooled by, "
+           "in under two minutes, with a reason for every pick.")
 
 
 def write_body(shape, lines, size=Pt(12)):
@@ -136,44 +106,56 @@ def write_body(shape, lines, size=Pt(12)):
         run.font.color.rgb = INK
 
 
+def body_box(slide):
+    boxes = [sh for sh in slide.shapes
+             if sh.has_text_frame and sh.shape_type == MSO_SHAPE_TYPE.TEXT_BOX]
+    boxes.sort(key=lambda s: s.top or 0)
+    return boxes
+
+
+def title_of(slide):
+    boxes = body_box(slide)
+    return boxes[0].text_frame.text.strip() if boxes else ""
+
+
 def main():
     prs = Presentation(TEMPLATE)
     slides = list(prs.slides)
+    sw = prs.slide_width
 
-    # Slide 1: identity labels
+    # Slide 1: fill the identity fields only. The template's title slide is a
+    # designed layout (INDIA.RUNS art), so we do not stamp our logo over it; the
+    # logo goes in the portal's team-logo field instead.
     for sh in slides[0].shapes:
         if sh.has_text_frame and sh.text_frame.text.strip() in IDENTITY:
             write_body(sh, [IDENTITY[sh.text_frame.text.strip()]], size=Pt(16))
 
-    # Content slides: the title is the upper text box, the prompt box is the
-    # lower one. Match the slide by its title text, then write into the LOWER box
-    # (or a fresh box if the slide has only a title, like Architecture).
+    # Content slides
     for slide in slides[1:]:
-        boxes = [sh for sh in slide.shapes
-                 if sh.has_text_frame and sh.shape_type == MSO_SHAPE_TYPE.TEXT_BOX]
+        boxes = body_box(slide)
         if not boxes:
             continue
-        boxes.sort(key=lambda s: s.top or 0)
         title = boxes[0].text_frame.text.strip()
-        if title not in BODY:
-            continue
-        if len(boxes) >= 2:
-            body_shape = boxes[-1]            # the lowest box is the prompt box
-        else:
-            body_shape = slide.shapes.add_textbox(Inches(0.4), Inches(1.7), Inches(9.3), Inches(3.3))
-        n = len(BODY[title])
-        write_body(body_shape, BODY[title], size=Pt(12 if n > 4 else 13))
+        body = boxes[-1] if len(boxes) >= 2 else None
 
-    # Closing slide
-    box = slides[-1].shapes.add_textbox(Inches(0.8), Inches(2.3), Inches(8.4), Inches(1.6))
-    write_body(box, [CLOSING], size=Pt(18))
+        if title in BODY:
+            n = len(BODY[title])
+            write_body(body, BODY[title], size=Pt(12 if n > 3 else 13))
+
+        elif title in IMAGES:
+            img, caption = IMAGES[title]
+            if body is not None:
+                write_body(body, [caption] if caption else [""], size=Pt(12))
+            top = Inches(1.95) if caption else Inches(1.5)
+            width = Inches(9.0)
+            left = Inches(0.5)
+            slide.shapes.add_picture(img, left, top, width=width)
+
+    # Closing slide: the template already has its own "Thank You" design, so we
+    # leave it clean and do not clutter it.
 
     prs.save(OUT)
-    titles_ok = all(
-        any(sh.has_text_frame and sh.text_frame.text.strip() in BODY for sh in s.shapes)
-        for s in slides[1:10]
-    )
-    print(f"Saved {OUT} ({len(slides)} slides). Titles preserved: {titles_ok}.")
+    print(f"Saved {OUT} with {len(slides)} slides, 5 diagrams, and the Khoj logo.")
 
 
 if __name__ == "__main__":
