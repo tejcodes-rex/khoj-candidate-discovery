@@ -2,7 +2,7 @@
   <rect width="1280" height="560" fill="#FFFFFF"/>
 
   <!-- LEFT: bar chart -->
-  <text x="40" y="44" font-size="20" font-weight="700" fill="#1E2A78">Top-100 quality vs a naive keyword ranking</text>
+  <text x="40" y="44" font-size="20" font-weight="700" fill="#1E2A78">Top 100 quality vs a naive keyword ranking</text>
   <text x="40" y="70" font-size="15" fill="#5B6472">Wrong candidates the two systems put in their top 100 (lower is better)</text>
 
   <!-- axes -->
@@ -60,9 +60,9 @@
   <!-- bottom strip -->
   <rect x="660" y="342" width="560" height="120" rx="14" fill="#1E2A78"/>
   <text x="684" y="378" font-size="16" fill="#CBD2F5">Compute constraints, all met:</text>
-  <text x="684" y="408" font-size="16" font-weight="600" fill="#FFFFFF">CPU only · no GPU · no network during ranking · standard library only</text>
-  <text x="684" y="438" font-size="16" font-weight="600" fill="#FFD45A">Official validator: "Submission is valid."  ·  top 100 is 100% India-based</text>
+  <text x="684" y="408" font-size="16" font-weight="600" fill="#FFFFFF">CPU only, no GPU, no network during ranking, standard library only</text>
+  <text x="684" y="438" font-size="16" font-weight="600" fill="#FFD45A">Official validator: "Submission is valid.", top 100 is 100% India based</text>
 
-  <text x="660" y="500" font-size="14" fill="#5B6472">Top 100: 71 strong-fit, 17 good-fit, 12 marginal. Zero off-role, zero stuffers, zero services-only.</text>
+  <text x="660" y="500" font-size="14" fill="#5B6472">Top 100: 71 strong fit, 17 good fit, 12 marginal. Zero off role, zero stuffers, zero services only.</text>
   <text x="660" y="523" font-size="14" fill="#5B6472">Top 10 are genuine retrieval / ranking builders; every keyword decoy is ranked out of the top 100.</text>
 </svg>

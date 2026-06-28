@@ -1,6 +1,6 @@
 <svg width="1280" height="470" viewBox="0 0 1280 470" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
   <rect width="1280" height="470" fill="#FFFFFF"/>
-  <text x="40" y="40" font-size="19" font-weight="700" fill="#1E2A78">How the score is built (transparent, rule-based, every term cites the candidate's own data)</text>
+  <text x="40" y="40" font-size="19" font-weight="700" fill="#1E2A78">How the score is built (transparent, rule based, every term cites the candidate's own data)</text>
 
   <!-- row 1: weighted sum -->
   <g>
@@ -27,10 +27,10 @@
   </g>
 
   <!-- row 2: multipliers -->
-  <text x="40" y="222" font-size="17" font-weight="700" fill="#14161F">then two real-world multipliers</text>
+  <text x="40" y="222" font-size="17" font-weight="700" fill="#14161F">then two real world multipliers</text>
   <rect x="40" y="238" width="300" height="70" rx="12" fill="#FFF4E8" stroke="#FFB020" stroke-width="2"/>
   <text x="190" y="270" font-size="17" font-weight="700" fill="#B25A00" text-anchor="middle">× behavioral availability</text>
-  <text x="190" y="294" font-size="14" fill="#8A5A1A" text-anchor="middle">recency, response rate, open-to-work</text>
+  <text x="190" y="294" font-size="14" fill="#8A5A1A" text-anchor="middle">recency, response rate, open to work</text>
   <rect x="360" y="238" width="260" height="70" rx="12" fill="#FFF4E8" stroke="#FFB020" stroke-width="2"/>
   <text x="490" y="270" font-size="17" font-weight="700" fill="#B25A00" text-anchor="middle">× location</text>
   <text x="490" y="294" font-size="14" fill="#8A5A1A" text-anchor="middle">India hubs, Pune/Noida preferred</text>
@@ -38,11 +38,11 @@
   <!-- row 3: penalties + honeypot -->
   <text x="660" y="222" font-size="17" font-weight="700" fill="#14161F">then named disqualifier penalties</text>
   <rect x="660" y="238" width="580" height="70" rx="12" fill="#FDECEC" stroke="#E5484D" stroke-width="2"/>
-  <text x="680" y="268" font-size="15" fill="#A02A2E">keyword stuffer ×0.15  ·  services-only ×0.7  ·  job-hopper ×0.8  ·  vision-only ×0.5</text>
-  <text x="680" y="292" font-size="15" font-weight="700" fill="#A02A2E">honeypot (impossible profile) → score forced to 0, excluded</text>
+  <text x="680" y="268" font-size="15" fill="#A02A2E">keyword stuffer ×0.15, services only ×0.7, job hopper ×0.8, vision only ×0.5</text>
+  <text x="680" y="292" font-size="15" font-weight="700" fill="#A02A2E">honeypot (an impossible profile) becomes score 0 and is excluded</text>
 
   <!-- final -->
   <rect x="40" y="350" width="1200" height="90" rx="14" fill="#1E2A78"/>
-  <text x="60" y="385" font-size="18" font-weight="700" fill="#FFFFFF">Final score  →  sort by score descending, then candidate id ascending  →  take the top 100</text>
-  <text x="60" y="416" font-size="15" fill="#FFD45A">No black box: a learning-to-rank model can slot in behind the same interface, but the JD is explicit enough that transparent feature scoring wins, and it explains itself.</text>
+  <text x="60" y="385" font-size="18" font-weight="700" fill="#FFFFFF">Final score, then sort by score descending and candidate id ascending, then take the top 100</text>
+  <text x="60" y="416" font-size="15" fill="#FFD45A">No black box: a learning to rank model can slot in behind the same interface, but the JD is explicit enough that transparent feature scoring wins, and it explains itself.</text>
 </svg>

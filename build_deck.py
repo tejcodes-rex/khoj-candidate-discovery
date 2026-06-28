@@ -30,42 +30,42 @@ IDENTITY = {
 # Slides answered in text (precise answers to every question on the slide).
 BODY = {
     "Solution Overview": [
-        "Khoj is an AI candidate-discovery engine that ranks the 100 best-fit candidates for the Senior "
+        "Khoj is an AI candidate discovery engine that ranks the 100 best fit candidates for the Senior "
         "AI Engineer role out of 100,000 profiles, with a grounded reason for every pick.",
         "It reads what each person actually built in their career history, not the keywords they pasted "
         "into a summary or skills list.",
-        "What differentiates it from traditional matching: keyword filters and embed-and-cosine systems "
-        "reward keyword stuffing and miss plainly-worded talent. Khoj instead scores demonstrated career "
-        "evidence over surface keywords, trust-weights skills by endorsements, time used and assessment "
+        "What differentiates it from traditional matching: keyword filters and embedding similarity systems "
+        "reward keyword stuffing and miss plainly worded talent. Khoj instead scores demonstrated career "
+        "evidence over surface keywords, weights skills by endorsements, time used and assessment "
         "scores, factors in whether a candidate is actually reachable, detects and excludes impossible "
         "\"honeypot\" profiles, and explains every decision.",
-        "It is transparent and fast: rule-based, the whole pool in under two minutes on a CPU with no "
+        "It is transparent and fast: rule based, the whole pool in under two minutes on a CPU with no "
         "network, where a system that calls a model per candidate cannot.",
     ],
     "JD Understanding & Candidate Evaluation": [
-        "Key requirements extracted from the JD: production embeddings and retrieval, vector-database or "
-        "hybrid-search operations, strong Python, ranking-evaluation literacy (NDCG, MRR, MAP), 6 to 8 "
+        "Key requirements extracted from the JD: production embeddings and retrieval, vector database or "
+        "hybrid search operations, strong Python, ranking evaluation literacy (NDCG, MRR, MAP), 6 to 8 "
         "years ideal, applied ML at product (not services) companies, an India hub or willingness to "
-        "relocate (Pune/Noida preferred), and a shipped end-to-end ranking, search or recommendation system.",
-        "Named disqualifiers we also read from the JD: keyword stuffers, services-only careers, title-"
-        "chasing job-hoppers, vision/speech-only without NLP or IR, and pure research without production.",
-        "Most important signals, and how we judge fit beyond keywords: career-history evidence of "
-        "retrieval/ranking/recsys work (weighted highest), trust-weighted skills, and behavioral "
+        "relocate (Pune/Noida preferred), and a shipped end to end ranking, search or recommendation system.",
+        "Named disqualifiers we also read from the JD: keyword stuffers, services only careers, title-"
+        "chasing job hoppers, vision/speech only without NLP or IR, and pure research without production.",
+        "Most important signals, and how we judge fit beyond keywords: career history evidence of "
+        "retrieval/ranking/recsys work (weighted highest), trust weighted skills, and behavioral "
         "availability. Because we read the demonstrated work, a strong candidate who built a recommendation "
         "system in plain words ranks high without the buzzwords, while a Marketing Manager who pasted AI "
         "skills ranks near zero.",
     ],
     "Technologies Used": [
-        "Python 3.12, standard library only in the ranking path (no third-party packages): chosen to meet "
+        "Python 3.12, standard library only in the ranking path (no third party packages): chosen to meet "
         "the 5-minute CPU reproduction limit, to scale to a real 200,000-plus pool, and so judges reproduce "
         "it with zero setup.",
-        "A custom word-boundary matcher, a hand-built skill ontology, and a transparent rule-based scorer: "
+        "A custom word boundary matcher, a hand built skill ontology, and a transparent rule based scorer: "
         "chosen over an embedding model because embeddings reward the keyword stuffing the JD warns about "
         "and cannot explain themselves.",
         "Streamlit for the hosted sandbox demo; pytest for the test suite, including a test that runs the "
         "organizers' own validator; Docker for reproducible Stage-3 runs; Git for authentic, incremental "
         "history.",
-        "No GPU, no network, and no per-candidate model calls anywhere in the ranking path, by design.",
+        "No GPU, no network, and no per candidate model calls anywhere in the ranking path, by design.",
     ],
     "Submission Assets": [
         "GitHub repository: TODO_repo_url  (public)",
@@ -79,10 +79,9 @@ BODY = {
 # Slides whose answer IS a diagram. Optional one-line caption above the image.
 IMAGES = {
     "Ranking Methodology": ("diagrams/scoring.png",
-        "Two stages, fully transparent: read demonstrated work, score four weighted components, refine with "
-        "two multipliers, apply named penalties, exclude honeypots, then sort."),
+        "The scoring is fully transparent, and every term reads from the candidate's own data."),
     "Explainability & Data Validation": ("diagrams/reasoning.png",
-        "Every pick is explained from the candidate's own fields; messy and impossible profiles are handled by construction."),
+        "Every pick is explained from the candidate's own data."),
     "End-to-End Workflow": ("diagrams/workflow.png", None),
     "System Architecture": ("diagrams/architecture.png", None),
     "Results & Performance": ("diagrams/results.png", None),
