@@ -20,3 +20,7 @@ Idea Submission Template _ Redrob.pptx
 # generated deck artifacts (rebuild with build_deck.py)
 Khoj_Redrob_Submission_Deck.pptx
 Khoj_Redrob_Submission_Deck.pdf
+
+# submission folder: generated deliverables (regenerable; live on disk for upload)
+submission/*.csv
+submission/*.pdf

@@ -1,0 +1,26 @@
+<svg width="900" height="240" viewBox="0 0 900 240" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Khoj">
+  <defs>
+    <linearGradient id="badge" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3B5BFF"/>
+      <stop offset="1" stop-color="#1E2A78"/>
+    </linearGradient>
+    <linearGradient id="gem" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFD45A"/>
+      <stop offset="1" stop-color="#FF7A45"/>
+    </linearGradient>
+  </defs>
+
+  <!-- mark: a magnifying glass (khoj = search/discovery) with a hidden gem in the lens -->
+  <rect x="16" y="28" width="184" height="184" rx="44" fill="url(#badge)"/>
+  <!-- lens -->
+  <circle cx="98" cy="106" r="52" fill="none" stroke="#FFFFFF" stroke-width="12"/>
+  <!-- handle -->
+  <rect x="138" y="146" width="56" height="18" rx="9" transform="rotate(45 138 146)" fill="#FFFFFF"/>
+  <!-- the hidden gem we surface -->
+  <path d="M98 84 L116 104 L98 132 L80 104 Z" fill="url(#gem)"/>
+  <path d="M98 84 L116 104 L98 104 Z" fill="#FFFFFF" fill-opacity="0.35"/>
+
+  <!-- wordmark -->
+  <text x="232" y="128" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="104" font-weight="700" fill="#14161F" letter-spacing="-2">Khoj</text>
+  <text x="236" y="176" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="25" font-weight="500" fill="#5B6472" letter-spacing="0.3">the discovery engine that finds what filters miss</text>
+</svg>

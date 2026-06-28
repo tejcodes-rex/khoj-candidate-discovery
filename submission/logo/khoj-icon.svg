@@ -1,0 +1,17 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Khoj icon">
+  <defs>
+    <linearGradient id="b" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3B5BFF"/>
+      <stop offset="1" stop-color="#1E2A78"/>
+    </linearGradient>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFD45A"/>
+      <stop offset="1" stop-color="#FF7A45"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="56" fill="url(#b)"/>
+  <circle cx="116" cy="120" r="62" fill="none" stroke="#FFFFFF" stroke-width="14"/>
+  <rect x="162" y="166" width="64" height="20" rx="10" transform="rotate(45 162 166)" fill="#FFFFFF"/>
+  <path d="M116 94 L138 120 L116 154 L94 120 Z" fill="url(#g)"/>
+  <path d="M116 94 L138 120 L116 120 Z" fill="#FFFFFF" fill-opacity="0.35"/>
+</svg>

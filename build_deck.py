@@ -23,7 +23,7 @@ OUT = "Khoj_Redrob_Submission_Deck.pptx"
 INK = RGBColor(0x20, 0x27, 0x29)  # the template's text color
 
 IDENTITY = {
-    "Team Name :": "Team Name : TODO_TEAM_ID",
+    "Team Name :": "Team Name : Khoj",
     "Team Leader Name :": "Team Leader Name : Tejas Mane",
     "Problem Statement :": "Problem Statement : Intelligent Candidate Discovery (Data and AI Challenge)",
 }
