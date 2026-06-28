@@ -68,7 +68,7 @@ BODY = {
         "No GPU, no network, and no per candidate model calls anywhere in the ranking path, by design.",
     ],
     "Submission Assets": [
-        "GitHub repository: TODO_repo_url  (public)",
+        "GitHub repository: https://github.com/tejcodes-rex/khoj-candidate-discovery",
         "Live sandbox demo: TODO_sandbox_url",
         "Reproduce command: python rank.py --candidates ./candidates.jsonl --out ./submission.csv",
         "Ranked output CSV: passes the official validator (\"Submission is valid.\"), 0 honeypots in the top 100.",

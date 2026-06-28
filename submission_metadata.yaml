@@ -24,7 +24,7 @@ team_members:
 # ============================================================================
 # Code and reproducibility
 # ============================================================================
-github_repo: "TODO_https://github.com/USERNAME/REPO"   # must be public before submitting
+github_repo: "https://github.com/tejcodes-rex/khoj-candidate-discovery"   # must be public before submitting
 sandbox_link: "TODO_hosted_demo_link"                  # HuggingFace Spaces / Streamlit / Replit / Colab / Docker / Binder
 reproduce_command: "python rank.py --candidates ./candidates.jsonl --out ./submission.csv"
 
