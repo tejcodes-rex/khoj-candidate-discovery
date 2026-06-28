@@ -23,7 +23,7 @@ import streamlit as st
 from khoj.scoring import score_candidate
 from khoj.reasoning import make_reasoning
 
-st.set_page_config(page_title="Khoj — Candidate Discovery", layout="wide")
+st.set_page_config(page_title="Khoj: Candidate Discovery", layout="wide")
 
 st.title("Khoj")
 st.caption("Intelligent candidate discovery for the Senior AI Engineer role. "

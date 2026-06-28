@@ -8,17 +8,17 @@ Suggested length: 10 to 12 slides.
 
 ---
 
-## Slide 1 — Title
+## Slide 1: Title
 
 **Khoj**
 Intelligent Candidate Discovery for the Senior AI Engineer role
 
-Team: [team name] · India Runs, Data and AI Challenge
+Team: [team name], India Runs, Data and AI Challenge
 One line: the ranker that reads what candidates built, not what they listed.
 
 ---
 
-## Slide 2 — The problem
+## Slide 2: The problem
 
 Redrob has to find a handful of genuine senior AI engineers inside a pool of
 100,000 profiles. Keyword filters fail at this in a specific, costly way:
@@ -34,7 +34,7 @@ and the dataset has traps built in to punish systems that think it is.
 
 ---
 
-## Slide 3 — Our approach in one sentence
+## Slide 3: Our approach in one sentence
 
 Treat the job description as the rubric. Score each candidate on what their career
 history proves they built, trust their skills only when the platform backs them
@@ -43,7 +43,7 @@ available.
 
 ---
 
-## Slide 4 — How it works
+## Slide 4: How it works
 
 Each candidate gets a fit score from four weighted parts:
 
@@ -63,7 +63,7 @@ penalties.
 
 ---
 
-## Slide 5 — The design bet: rules over a black box
+## Slide 5: The design bet: rules over a black box
 
 We did not build "embed everything and sort by similarity." Three reasons:
 
@@ -75,7 +75,7 @@ We did not build "embed everything and sort by similarity." Three reasons:
 
 ---
 
-## Slide 6 — Defeating the traps (the headline)
+## Slide 6: Defeating the traps (the headline)
 
 We compared our top 100 against a naive keyword-count ranking, the trap the JD
 built the dataset around:
@@ -93,7 +93,7 @@ job. Ours has none.
 
 ---
 
-## Slide 7 — Honeypots and disqualification safety
+## Slide 7: Honeypots and disqualification safety
 
 The pool seeds about 80 internally-impossible profiles. Ranking more than 10
 percent of them in the top 100 is an automatic disqualification.
@@ -105,7 +105,7 @@ percent of them in the top 100 is an automatic disqualification.
 
 ---
 
-## Slide 8 — Results and reproducibility
+## Slide 8: Results and reproducibility
 
 - Passes the organizers' validator: "Submission is valid."
 - Ranks all 100,000 candidates in about 40 seconds on a laptop CPU, no GPU, no
@@ -117,7 +117,7 @@ percent of them in the top 100 is an automatic disqualification.
 
 ---
 
-## Slide 9 — Reasoning you can trust
+## Slide 9: Reasoning you can trust
 
 Every one of the 100 rows carries a grounded, one-line justification built from
 the candidate's own fields, with honest concerns surfaced. Example:
@@ -130,7 +130,7 @@ Nothing templated, nothing invented, tone matched to the rank.
 
 ---
 
-## Slide 10 — Why this is the right system for Redrob
+## Slide 10: Why this is the right system for Redrob
 
 This is not a benchmark hack. It is the shape of a real recruiting ranker:
 explainable to recruiters, fast enough to run over the whole pool on commodity
@@ -139,7 +139,7 @@ search invites. It is the v2 ranker the JD itself asks the hire to build.
 
 ---
 
-## Slide 11 — Roadmap
+## Slide 11: Roadmap
 
 - Calibrate the trust and disqualifier thresholds against a small labeled set.
 - Add a lexical or learned similarity signal as one more component.
@@ -148,9 +148,9 @@ search invites. It is the v2 ranker the JD itself asks the hire to build.
 
 ---
 
-## Slide 12 — Close
+## Slide 12: Close
 
 Khoj finds the engineers a keyword filter buries and refuses the ones it would be
 fooled by, in 40 seconds, with a reason for every pick.
 
-Repo: [github url] · Live demo: [sandbox url]
+Repo: [github url], Live demo: [sandbox url]

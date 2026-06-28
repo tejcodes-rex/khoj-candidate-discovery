@@ -1,4 +1,4 @@
-# Khoj — Intelligent Candidate Discovery
+# Khoj: Intelligent Candidate Discovery
 
 Ranking the top 100 candidates for Redrob's Senior AI Engineer role out of a pool of 100,000, for the India Runs Data and AI Challenge.
 

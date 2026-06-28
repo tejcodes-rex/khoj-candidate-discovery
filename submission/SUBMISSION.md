@@ -1,6 +1,6 @@
-# Khoj — Submission Package
+# Khoj: Submission Package
 
-Team: **Khoj** · Track 1, Data and AI Challenge (Intelligent Candidate Discovery) · India Runs by Redrob AI
+Team: **Khoj**, Track 1, Data and AI Challenge (Intelligent Candidate Discovery), India Runs by Redrob AI
 
 Everything the portal needs is in this folder. Follow the steps at the bottom.
 
