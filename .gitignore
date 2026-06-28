@@ -27,3 +27,4 @@ submission/*.pdf
 
 # temp per-slide PNG exports (regenerated when verifying the deck)
 diagrams/slides/
+submission/*.xlsx
