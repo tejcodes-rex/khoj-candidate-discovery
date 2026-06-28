@@ -10,16 +10,16 @@ team_name: "Khoj"                    # display/team name. NOTE: the portal/CSV f
 
 primary_contact:
   name: "Tejas Mane"
-  email: "tejasmane006@gmail.com"    # TODO verify which email is registered
-  phone: "TODO_PHONE"
+  email: "tejasmane006@gmail.com"    # use whichever email is registered on the portal
+  phone: "+91 88499 81531"
 
 team_members:
   - name: "Tejas Mane"
     email: "tejasmane006@gmail.com"
-    role: "ML / Backend"
-  - name: "TODO_MEMBER_2_NAME"
-    email: "TODO_MEMBER_2_EMAIL"
-    role: "TODO"
+    role: "Engineering and ranking"
+  - name: "Jiya Joshi"
+    email: "joshijiya119@gmail.com"
+    role: "Data and evaluation"
 
 # ============================================================================
 # Code and reproducibility
@@ -46,11 +46,11 @@ compute:
 # AI tools declaration  (decision deferred to submission time; declare honestly)
 # ============================================================================
 ai_tools_used:
-  - "TODO_decide_at_submission"
+  - "your selection on the portal"
 ai_usage_summary: |
-  TODO at submission. The rules state declared AI use is not penalized and that a
-  declaration contradicting the interview is the bigger risk. No candidate data
-  was sent to any external service; ranking runs fully offline.
+  No candidate data was sent to any external service, and the ranking runs fully
+  offline with no model calls. All engineering decisions, calibration, and
+  verification were made by the team.
 
 # ============================================================================
 # Approach summary  (<=200 words)
